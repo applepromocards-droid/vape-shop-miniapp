@@ -16,6 +16,7 @@ export interface Product {
   id: string;
   categoryId: string;
   title: string;
+  titleEn?: string;
   price: number;
   currency: string;
   emoji: string;
@@ -36,7 +37,9 @@ export interface Hero {
   visible: boolean;
   tag: string;
   title: string;
+  titleEn?: string;
   subtitle: string;
+  subtitleEn?: string;
   image?: string;
   imagePosition?: { x: number; y: number };
   imageZoom?: number; // percent of container width, default 200

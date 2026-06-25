@@ -1591,3 +1591,9 @@ body {
 .ref-page__share-tag {
   font-size: 11px; color: var(--faint); margin-top: 10px; line-height: 1.4;
 }
+
+.admin-hint-inline {
+  font-size: 10px; font-weight: 400;
+  color: var(--faint); margin-left: 4px;
+  text-transform: lowercase;
+}

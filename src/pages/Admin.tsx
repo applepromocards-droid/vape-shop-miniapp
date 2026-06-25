@@ -9,6 +9,7 @@ type CatForm = { id?: string; title: string; subtitle: string; emoji: string; im
 type ProdForm = {
   id?: string;
   title: string;
+  titleEn: string;
   price: number;
   currency: string;
   emoji: string;
@@ -22,12 +23,12 @@ type ProdForm = {
 
 const BLANK_CAT: CatForm = { title: "", subtitle: "", emoji: "🛒", image: undefined };
 const blankProd = (catId = ""): ProdForm => ({
-  title: "", price: 0, currency: "€",
+  title: "", titleEn: "", price: 0, currency: "€",
   emoji: "📦", categoryId: catId, puffs: 0, badge: "", inStock: true,
   image: undefined, flavors: [],
 });
 
-type HeroForm = Pick<Hero, "visible" | "tag" | "title" | "subtitle"> & {
+type HeroForm = Pick<Hero, "visible" | "tag" | "title" | "titleEn" | "subtitle" | "subtitleEn"> & {
   image?: string;
   imagePosition?: { x: number; y: number };
   imageZoom?: number;
@@ -83,7 +84,9 @@ export function Admin({ onClose }: { onClose: () => void }) {
     visible: hero.visible,
     tag: hero.tag,
     title: hero.title,
+    titleEn: hero.titleEn ?? "",
     subtitle: hero.subtitle,
+    subtitleEn: hero.subtitleEn ?? "",
     image: hero.image,
     imagePosition: hero.imagePosition,
     imageZoom: hero.imageZoom ?? 200,
@@ -199,7 +202,7 @@ export function Admin({ onClose }: { onClose: () => void }) {
   };
   const openEditProd = (p: Product, from: Mode = "prods") => {
     setProdForm({
-      id: p.id, title: p.title,
+      id: p.id, title: p.title, titleEn: p.titleEn ?? "",
       price: p.price, currency: p.currency, emoji: p.emoji,
       categoryId: p.categoryId, puffs: p.puffs ?? 0,
       badge: p.badge ?? "", inStock: p.inStock,
@@ -216,6 +219,7 @@ export function Admin({ onClose }: { onClose: () => void }) {
       .map((f) => ({ ...f, name: f.name.trim() }));
     const data: Omit<Product, "id"> = {
       title: prodForm.title.trim(),
+      titleEn: prodForm.titleEn.trim() || undefined,
       price: Number(prodForm.price) || 0,
       currency: prodForm.currency || "€",
       emoji: prodForm.emoji || "📦",
@@ -277,7 +281,9 @@ export function Admin({ onClose }: { onClose: () => void }) {
       visible: heroForm.visible,
       tag: heroForm.tag.trim(),
       title: heroForm.title,
+      titleEn: heroForm.titleEn?.trim() || undefined,
       subtitle: heroForm.subtitle.trim(),
+      subtitleEn: heroForm.subtitleEn?.trim() || undefined,
       image: heroForm.image || undefined,
       imagePosition: heroForm.image ? (heroForm.imagePosition ?? { x: 50, y: 30 }) : undefined,
       imageZoom: heroForm.image ? (heroForm.imageZoom ?? 200) : undefined,
@@ -363,7 +369,7 @@ export function Admin({ onClose }: { onClose: () => void }) {
               tmp.onload = () => { heroNatural.current = { w: tmp.naturalWidth, h: tmp.naturalHeight }; };
               tmp.src = hero.image;
             }
-            setHeroForm({ visible: hero.visible, tag: hero.tag, title: hero.title, subtitle: hero.subtitle, image: hero.image, imagePosition: hero.imagePosition, imageZoom: hero.imageZoom ?? 200 });
+            setHeroForm({ visible: hero.visible, tag: hero.tag, title: hero.title, titleEn: hero.titleEn ?? "", subtitle: hero.subtitle, subtitleEn: hero.subtitleEn ?? "", image: hero.image, imagePosition: hero.imagePosition, imageZoom: hero.imageZoom ?? 200 });
             setMode("banner");
           }}>
             Новинки
@@ -492,7 +498,7 @@ export function Admin({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="admin-field">
-            <label className="admin-label">Название товара</label>
+            <label className="admin-label">Название товара (RU)</label>
             <textarea
               className="admin-input admin-textarea"
               value={heroForm.title}
@@ -504,12 +510,33 @@ export function Admin({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="admin-field">
-            <label className="admin-label">Подпись</label>
+            <label className="admin-label">Название товара (EN) <span className="admin-hint-inline">необязательно</span></label>
+            <textarea
+              className="admin-input admin-textarea"
+              value={heroForm.titleEn ?? ""}
+              onChange={(e) => setHeroForm((f) => ({ ...f, titleEn: e.target.value }))}
+              placeholder={"Elf Bar\nSweet King"}
+              rows={2}
+            />
+          </div>
+
+          <div className="admin-field">
+            <label className="admin-label">Подпись (RU)</label>
             <input
               className="admin-input"
               value={heroForm.subtitle}
               onChange={(e) => setHeroForm((f) => ({ ...f, subtitle: e.target.value }))}
               placeholder="30 000 затяжек · 4 вкуса"
+            />
+          </div>
+
+          <div className="admin-field">
+            <label className="admin-label">Подпись (EN) <span className="admin-hint-inline">необязательно</span></label>
+            <input
+              className="admin-input"
+              value={heroForm.subtitleEn ?? ""}
+              onChange={(e) => setHeroForm((f) => ({ ...f, subtitleEn: e.target.value }))}
+              placeholder="30,000 puffs · 4 flavors"
             />
           </div>
 
@@ -695,11 +722,21 @@ export function Admin({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="admin-field">
-            <label className="admin-label">Название *</label>
+            <label className="admin-label">Название (RU) *</label>
             <input
               className="admin-input"
               value={prodForm.title}
               onChange={(e) => setProdForm((f) => ({ ...f, title: e.target.value }))}
+              placeholder="Elf Bar BC10000"
+            />
+          </div>
+
+          <div className="admin-field">
+            <label className="admin-label">Название (EN) <span className="admin-hint-inline">необязательно</span></label>
+            <input
+              className="admin-input"
+              value={prodForm.titleEn}
+              onChange={(e) => setProdForm((f) => ({ ...f, titleEn: e.target.value }))}
               placeholder="Elf Bar BC10000"
             />
           </div>

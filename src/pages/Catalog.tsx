@@ -103,8 +103,14 @@ export function Catalog() {
           )}
           <div className="mm-hero__content">
             {hero.tag && <span className="mm-hero__tag">{hero.tag}</span>}
-            <div className="mm-hero__name" style={{ whiteSpace: "pre-line" }}>{hero.title}</div>
-            {hero.subtitle && <div className="mm-hero__sub">{hero.subtitle}</div>}
+            <div className="mm-hero__name" style={{ whiteSpace: "pre-line" }}>
+              {lang === "en" && hero.titleEn ? hero.titleEn : hero.title}
+            </div>
+            {(hero.subtitle || hero.subtitleEn) && (
+              <div className="mm-hero__sub">
+                {lang === "en" && hero.subtitleEn ? hero.subtitleEn : hero.subtitle}
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -12,7 +12,7 @@ interface Props {
 export function ProductCard({ product, onSelectFlavor }: Props) {
   const { add } = useCart();
   const { isFavorite, toggle } = useFavorites();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   const hasFlavors = (product.flavors?.length ?? 0) > 0;
   const anyInStock = hasFlavors
@@ -39,7 +39,7 @@ export function ProductCard({ product, onSelectFlavor }: Props) {
         }
       </div>
       <div className="prod-card__body">
-        <div className="prod-card__title">{product.title}</div>
+        <div className="prod-card__title">{lang === "en" && product.titleEn ? product.titleEn : product.title}</div>
         {hasFlavors ? (
           <div className="prod-card__flavors">
             {inStockCount > 0
