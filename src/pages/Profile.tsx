@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
-import { getTg, getInitData } from "../telegram";
+import { useState, useEffect } from "react";
+import { getTg } from "../telegram";
 
 interface Props {
   onOpenAdmin: () => void;
   onOpenOrders: () => void;
   onOpenAddresses: () => void;
+  onOpenReferral: () => void;
   isAdmin: boolean;
 }
 
-export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, isAdmin }: Props) {
+export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, onOpenReferral, isAdmin }: Props) {
   const user = getTg()?.initDataUnsafe.user;
   const name = user
     ? `${user.first_name}${user.last_name ? " " + user.last_name : ""}`
@@ -16,17 +17,11 @@ export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, isAdmin }:
   const username = user?.username ? `@${user.username}` : null;
 
   const [supportUrl, setSupportUrl] = useState("");
-  const [refStats, setRefStats] = useState<{ confirmed: number; pending: number; rewardReady: boolean } | null>(null);
 
   useEffect(() => {
     fetch("/api/config")
       .then(r => r.json())
       .then(d => { if (d.supportUrl) setSupportUrl(d.supportUrl); })
-      .catch(() => {});
-
-    fetch("/api/referrals/my", { headers: { "x-telegram-init-data": getInitData() } })
-      .then(r => r.json())
-      .then(d => setRefStats(d))
       .catch(() => {});
   }, []);
 
@@ -40,9 +35,10 @@ export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, isAdmin }:
   };
 
   const MENU = [
-    { icon: "📦", label: "Мои заказы",     action: onOpenOrders },
-    { icon: "📍", label: "Адреса доставки", action: onOpenAddresses },
-    { icon: "💬", label: "Поддержка",       action: openSupport },
+    { icon: "📦", label: "Мои заказы",              action: onOpenOrders },
+    { icon: "📍", label: "Адреса доставки",          action: onOpenAddresses },
+    { icon: "🔗", label: "Реферальная программа",   action: onOpenReferral },
+    { icon: "💬", label: "Поддержка",                action: openSupport },
   ];
 
   return (
@@ -57,33 +53,6 @@ export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, isAdmin }:
         </div>
         <div className="profile__name">{name}</div>
         {username && <div className="profile__username">{username}</div>}
-
-        {/* Referral block */}
-        {user?.username && (
-          <div className="profile__ref-block">
-            <div className="profile__ref-title">🔗 Реферальная программа</div>
-            <div className="profile__ref-sub">Приведи 3 друга — получи бесплатную курилку!</div>
-            {refStats && (
-              <>
-                <div className="profile__ref-progress">
-                  <div className="profile__ref-bar">
-                    <div className="profile__ref-fill" style={{ width: `${Math.min(100, (refStats.confirmed / 3) * 100)}%` }} />
-                  </div>
-                  <span className="profile__ref-count">{refStats.confirmed}/3</span>
-                </div>
-                {refStats.rewardReady
-                  ? <div className="profile__ref-reward">🎁 Награда уже в пути! Проверь Telegram.</div>
-                  : refStats.pending > 0
-                    ? <div className="profile__ref-pending">⏳ {refStats.pending} {refStats.pending === 1 ? "заказ ожидает" : "заказа ожидают"} подтверждения</div>
-                    : null
-                }
-                <div className="profile__ref-share">
-                  Твой тег: <b>@{user.username}</b> — поделись с друзьями
-                </div>
-              </>
-            )}
-          </div>
-        )}
 
         <div className="profile__menu">
           {MENU.map((m) => (

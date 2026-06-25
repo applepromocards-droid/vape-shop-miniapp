@@ -67,11 +67,20 @@ referralsRouter.post("/", async (req, res) => {
   return res.json({ ok: true });
 });
 
-// GET /api/referrals/my — inviter's stats (how many people I brought)
+// GET /api/referrals/my — stats for the current user
 referralsRouter.get("/my", async (req, res) => {
   const user = getUser(req);
   if (!user) return res.status(401).json({ error: "Unauthorized" });
-  if (!user.username) return res.json({ confirmed: 0, pending: 0, total: 0, rewardReady: false });
+
+  // Who invited me
+  const myReferral = await prisma.referral.findUnique({ where: { invitedUserId: user.id } });
+
+  if (!user.username) {
+    return res.json({
+      confirmed: 0, pending: 0, total: 0, rewardReady: false,
+      invitedBy: myReferral?.inviterUsername ?? null,
+    });
+  }
 
   await upsertUser(user.id, user.username, user.name);
 
@@ -80,7 +89,11 @@ referralsRouter.get("/my", async (req, res) => {
   });
   const confirmed = refs.filter(r => r.confirmed).length;
   const pending   = refs.filter(r => !r.confirmed).length;
-  return res.json({ confirmed, pending, total: refs.length, rewardReady: confirmed >= REWARD_COUNT });
+  return res.json({
+    confirmed, pending, total: refs.length,
+    rewardReady: confirmed >= REWARD_COUNT,
+    invitedBy: myReferral?.inviterUsername ?? null,
+  });
 });
 
 // Called internally from orders route when order is completed

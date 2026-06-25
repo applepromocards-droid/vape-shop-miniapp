@@ -13,9 +13,10 @@ import { Checkout } from "./pages/Checkout";
 import { Orders } from "./pages/Orders";
 import { Addresses } from "./pages/Addresses";
 import { ReferralOnboarding } from "./pages/ReferralOnboarding";
+import { Referral } from "./pages/Referral";
 import { getTg, initTelegram } from "./telegram";
 
-type Screen = "main" | "admin" | "checkout" | "orders" | "addresses";
+type Screen = "main" | "admin" | "checkout" | "orders" | "addresses" | "referral";
 
 function hasSeenRefOnboarding() {
   const uid = getTg()?.initDataUnsafe.user?.id;
@@ -60,6 +61,7 @@ function AppInner() {
   if (screen === "checkout")  return <Checkout   onClose={() => setScreen("main")} />;
   if (screen === "orders")    return <Orders     onClose={() => setScreen("main")} />;
   if (screen === "addresses") return <Addresses  onClose={() => setScreen("main")} />;
+  if (screen === "referral")  return <Referral   onClose={() => setScreen("main")} />;
 
   return (
     <div className="app">
@@ -70,9 +72,10 @@ function AppInner() {
         {tab === "profile"   && (
           <Profile
             isAdmin={isAdmin}
-            onOpenAdmin={()     => setScreen("admin")}
-            onOpenOrders={()    => setScreen("orders")}
-            onOpenAddresses={() => setScreen("addresses")}
+            onOpenAdmin={()      => setScreen("admin")}
+            onOpenOrders={()     => setScreen("orders")}
+            onOpenAddresses={()  => setScreen("addresses")}
+            onOpenReferral={()   => setScreen("referral")}
           />
         )}
       </main>
