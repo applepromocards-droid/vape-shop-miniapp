@@ -7,7 +7,7 @@ const MENU = [
   { icon: "💬", label: "Поддержка" },
 ];
 
-export function Profile({ onOpenAdmin }: { onOpenAdmin: () => void }) {
+export function Profile({ onOpenAdmin, isAdmin }: { onOpenAdmin: () => void; isAdmin: boolean }) {
   const user = getTg()?.initDataUnsafe.user;
   const name = user
     ? `${user.first_name}${user.last_name ? " " + user.last_name : ""}`
@@ -35,11 +35,13 @@ export function Profile({ onOpenAdmin }: { onOpenAdmin: () => void }) {
               <span className="menu-item__arrow">›</span>
             </button>
           ))}
-          <button className="menu-item menu-item--admin" onClick={onOpenAdmin}>
-            <span className="menu-item__icon">⚙️</span>
-            <span className="menu-item__label">Управление каталогом</span>
-            <span className="menu-item__arrow">›</span>
-          </button>
+          {isAdmin && (
+            <button className="menu-item menu-item--admin" onClick={onOpenAdmin}>
+              <span className="menu-item__icon">⚙️</span>
+              <span className="menu-item__label">Управление каталогом</span>
+              <span className="menu-item__arrow">›</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

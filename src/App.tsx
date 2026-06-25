@@ -11,7 +11,7 @@ import { Admin } from "./pages/Admin";
 import { initTelegram } from "./telegram";
 
 function AppInner() {
-  const { loading } = useCatalog();
+  const { loading, isAdmin } = useCatalog();
   const [tab, setTab] = useState<Tab>("catalog");
   const [ageOk, setAgeOk] = useState(isAgeConfirmed());
   const [showAdmin, setShowAdmin] = useState(false);
@@ -34,7 +34,7 @@ function AppInner() {
         {tab === "catalog"   && <Catalog />}
         {tab === "favorites" && <Favorites />}
         {tab === "cart"      && <Cart />}
-        {tab === "profile"   && <Profile onOpenAdmin={() => setShowAdmin(true)} />}
+        {tab === "profile"   && <Profile onOpenAdmin={() => setShowAdmin(true)} isAdmin={isAdmin} />}
       </main>
       <BottomNav active={tab} onChange={setTab} />
     </div>

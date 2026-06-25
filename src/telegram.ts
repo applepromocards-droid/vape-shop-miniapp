@@ -70,3 +70,7 @@ export function initTelegram(): TgWebApp | null {
 export function haptic(type: "light" | "medium" | "heavy" = "light") {
   getTg()?.HapticFeedback.impactOccurred(type);
 }
+
+export function getInitData(): string {
+  return getTg()?.initData ?? "";
+}

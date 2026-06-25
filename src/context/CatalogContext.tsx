@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import type { Category, Hero, Product } from "../types";
+import { getInitData } from "../telegram";
 
 const API = "/api";
 
@@ -9,6 +10,13 @@ const DEFAULT_HERO: Hero = {
   title: "Elf Bar\nSweet King",
   subtitle: "30 000 затяжек · 4 вкуса",
 };
+
+function adminHeaders(): HeadersInit {
+  return {
+    "Content-Type": "application/json",
+    "x-telegram-init-data": getInitData(),
+  };
+}
 
 async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options);
@@ -21,6 +29,7 @@ interface CatalogCtx {
   products: Product[];
   hero: Hero;
   loading: boolean;
+  isAdmin: boolean;
   addCategory: (c: Omit<Category, "id">) => Promise<void>;
   updateCategory: (c: Category) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
@@ -39,17 +48,26 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const [products, setProducts]     = useState<Product[]>([]);
   const [hero, setHero]             = useState<Hero>(DEFAULT_HERO);
   const [loading, setLoading]       = useState(true);
+  const [isAdmin, setIsAdmin]       = useState(false);
 
   useEffect(() => {
+    const initData = getInitData();
+
     Promise.all([
       apiFetch<Category[]>(`${API}/categories`),
       apiFetch<Product[]>(`${API}/products`),
       apiFetch<Hero>(`${API}/hero`),
+      apiFetch<{ isAdmin: boolean }>(`${API}/auth/is-admin`, {
+        method: "POST",
+        headers: adminHeaders(),
+        body: JSON.stringify({ initData }),
+      }),
     ])
-      .then(([cats, prods, h]) => {
+      .then(([cats, prods, h, adminRes]) => {
         setCategories(cats);
         setProducts(prods);
         setHero(h);
+        setIsAdmin(adminRes.isAdmin);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -58,7 +76,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const addCategory = async (c: Omit<Category, "id">) => {
     const newCat = await apiFetch<Category>(`${API}/categories`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: adminHeaders(),
       body: JSON.stringify(c),
     });
     setCategories((prev) => [...prev, newCat]);
@@ -67,7 +85,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const updateCategory = async (c: Category) => {
     const updated = await apiFetch<Category>(`${API}/categories/${c.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: adminHeaders(),
       body: JSON.stringify(c),
     });
     setCategories((prev) => prev.map((x) => (x.id === c.id ? updated : x)));
@@ -82,7 +100,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const addProduct = async (p: Omit<Product, "id">) => {
     const newProd = await apiFetch<Product>(`${API}/products`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: adminHeaders(),
       body: JSON.stringify(p),
     });
     setProducts((prev) => [...prev, newProd]);
@@ -91,7 +109,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const updateProduct = async (p: Product) => {
     const updated = await apiFetch<Product>(`${API}/products/${p.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: adminHeaders(),
       body: JSON.stringify(p),
     });
     setProducts((prev) => prev.map((x) => (x.id === p.id ? updated : x)));
@@ -108,7 +126,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const updateHero = async (h: Hero) => {
     await apiFetch(`${API}/hero`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: adminHeaders(),
       body: JSON.stringify(h),
     });
     setHero(h);
@@ -128,7 +146,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
 
   return (
     <Ctx.Provider value={{
-      categories, products, hero, loading,
+      categories, products, hero, loading, isAdmin,
       addCategory, updateCategory, deleteCategory,
       addProduct, updateProduct, deleteProduct,
       productsByCategory, updateHero, resetToDefaults,
