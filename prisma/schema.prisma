@@ -59,9 +59,10 @@ model Order {
 
 model Address {
   id        String   @id @default(cuid())
-  tgUserId  String   @unique
+  tgUserId  String
   address   String
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  @@index([tgUserId])
 }
 
 model Hero {

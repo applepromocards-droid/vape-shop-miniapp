@@ -1011,6 +1011,35 @@ body {
   flex-direction: column;
 }
 
+.checkout__addr-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.checkout__addr-chip {
+  background: var(--card);
+  border: 1.5px solid var(--border-r);
+  border-radius: 12px;
+  padding: 11px 14px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.checkout__addr-chip--active {
+  border-color: var(--red);
+  background: rgba(201, 48, 44, 0.08);
+  color: var(--text);
+}
+
 .checkout__address {
   background: var(--card);
   border: 1.5px solid var(--border-r-med);

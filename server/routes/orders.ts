@@ -91,12 +91,16 @@ function buildAdminMessage(order: {
   ].join("\n");
 }
 
-// GET /api/orders/address — saved address for user
+// GET /api/orders/address — saved addresses for user (latest first)
 ordersRouter.get("/address", async (req, res) => {
   const user = getUser(req);
   if (!user) return res.status(401).json({ error: "Unauthorized" });
-  const saved = await prisma.address.findUnique({ where: { tgUserId: user.id } });
-  return res.json({ address: saved?.address ?? null });
+  const saved = await prisma.address.findMany({
+    where: { tgUserId: user.id },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+  });
+  return res.json({ addresses: saved.map((a) => a.address) });
 });
 
 // POST /api/orders — place order
@@ -125,13 +129,19 @@ ordersRouter.post("/", async (req, res) => {
     },
   });
 
-  // Save / update address for next time
+  // Save address if new (keep last 5 per user)
   if (delivery && address) {
-    await prisma.address.upsert({
-      where: { tgUserId: user.id },
-      update: { address },
-      create: { tgUserId: user.id, address },
-    });
+    const exists = await prisma.address.findFirst({ where: { tgUserId: user.id, address } });
+    if (!exists) {
+      await prisma.address.create({ data: { tgUserId: user.id, address } });
+      const all = await prisma.address.findMany({
+        where: { tgUserId: user.id },
+        orderBy: { createdAt: "desc" },
+      });
+      if (all.length > 5) {
+        await prisma.address.deleteMany({ where: { id: { in: all.slice(5).map((a) => a.id) } } });
+      }
+    }
   }
 
   // Notify admin

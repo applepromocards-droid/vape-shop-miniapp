@@ -14,6 +14,7 @@ export function Checkout({ onClose }: { onClose: () => void }) {
   const [deliveryType, setDeliveryType] = useState<DeliveryType>("delivery");
   const [address, setAddress]           = useState("");
   const [payment, setPayment]           = useState<PaymentType>("cash");
+  const [savedAddresses, setSavedAddresses] = useState<string[]>([]);
   const [placing, setPlacing]           = useState(false);
   const [placed, setPlaced]             = useState(false);
 
@@ -23,11 +24,16 @@ export function Checkout({ onClose }: { onClose: () => void }) {
   const shipFee   = deliveryType === "delivery" && !freeShip ? 10 : 0;
   const finalTotal = total + shipFee;
 
-  // Load saved address
+  // Load saved addresses
   useEffect(() => {
     fetch("/api/orders/address", { headers: { "x-telegram-init-data": getInitData() } })
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d?.address) setAddress(d.address); })
+      .then(d => {
+        if (d?.addresses?.length) {
+          setSavedAddresses(d.addresses);
+          setAddress(d.addresses[0]);
+        }
+      })
       .catch(() => {});
   }, []);
 
@@ -140,6 +146,21 @@ export function Checkout({ onClose }: { onClose: () => void }) {
           {deliveryType === "delivery" && (
             <div className="checkout__address-wrap">
               <div className="checkout__label" style={{ marginTop: 20 }}>Адрес доставки</div>
+
+              {savedAddresses.length > 0 && (
+                <div className="checkout__addr-chips">
+                  {savedAddresses.map(a => (
+                    <button
+                      key={a}
+                      className={`checkout__addr-chip${address === a ? " checkout__addr-chip--active" : ""}`}
+                      onClick={() => { haptic("light"); setAddress(a); }}
+                    >
+                      📍 {a}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <textarea
                 className="checkout__address"
                 placeholder="Улица, дом, квартира"
