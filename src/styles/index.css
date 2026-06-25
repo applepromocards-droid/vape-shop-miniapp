@@ -1547,3 +1547,22 @@ body {
 .ref-page__note {
   font-size: 11px; color: var(--faint); margin-top: 8px; line-height: 1.4;
 }
+
+.ref-page__no-username {
+  margin: 0 18px 16px;
+  background: rgba(201,48,44,.1);
+  border: 1px solid rgba(201,48,44,.35);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+}
+.ref-page__no-username-icon { font-size: 28px; margin-bottom: 6px; }
+.ref-page__no-username-title {
+  font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 6px;
+}
+.ref-page__no-username-text {
+  font-size: 12px; color: var(--muted); line-height: 1.5; margin: 0;
+}
+.ref-page__disabled-hint {
+  font-size: 13px; color: var(--faint); padding: 4px 0 8px;
+}

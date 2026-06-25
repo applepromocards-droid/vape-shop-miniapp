@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getInitData, haptic } from "../telegram";
+import { getInitData, haptic, getTg } from "../telegram";
 
 interface Stats {
   confirmed: number;
@@ -51,6 +51,8 @@ export function Referral({ onClose }: { onClose: () => void }) {
   };
 
   const confirmed = stats?.confirmed ?? 0;
+  const myUsername = getTg()?.initDataUnsafe.user?.username;
+  const noUsername = !myUsername;
 
   return (
     <div className="ref-page">
@@ -65,22 +67,40 @@ export function Referral({ onClose }: { onClose: () => void }) {
         <div className="ref-page__hero-text">Приведи 3 друга —<br />получи бесплатную курилку!</div>
       </div>
 
+      {/* No username warning */}
+      {noUsername && (
+        <div className="ref-page__no-username">
+          <div className="ref-page__no-username-icon">⚠️</div>
+          <div className="ref-page__no-username-title">Нет @username в Telegram</div>
+          <p className="ref-page__no-username-text">
+            Для участия в реферальной программе тебе нужен @username в Telegram.
+            Установи его в настройках Telegram, затем перезапусти приложение.
+          </p>
+        </div>
+      )}
+
       {/* Progress */}
       <div className="ref-page__card">
         <div className="ref-page__card-label">Твои рефералы</div>
-        <div className="ref-page__progress-row">
-          <div className="ref-page__bar">
-            <div className="ref-page__fill" style={{ width: `${Math.min(100, (confirmed / 3) * 100)}%` }} />
-          </div>
-          <span className="ref-page__count">{confirmed}/3</span>
-        </div>
-        {stats?.rewardReady && (
-          <div className="ref-page__reward">🎁 Награда отправлена в Telegram!</div>
-        )}
-        {!stats?.rewardReady && stats && stats.pending > 0 && (
-          <div className="ref-page__pending">
-            ⏳ {stats.pending} {stats.pending === 1 ? "друг ещё не сделал" : "друга ещё не сделали"} первый заказ
-          </div>
+        {noUsername ? (
+          <div className="ref-page__disabled-hint">Недоступно без @username</div>
+        ) : (
+          <>
+            <div className="ref-page__progress-row">
+              <div className="ref-page__bar">
+                <div className="ref-page__fill" style={{ width: `${Math.min(100, (confirmed / 3) * 100)}%` }} />
+              </div>
+              <span className="ref-page__count">{confirmed}/3</span>
+            </div>
+            {stats?.rewardReady && (
+              <div className="ref-page__reward">🎁 Награда отправлена в Telegram!</div>
+            )}
+            {!stats?.rewardReady && stats && stats.pending > 0 && (
+              <div className="ref-page__pending">
+                ⏳ {stats.pending} {stats.pending === 1 ? "друг ещё не сделал" : "друга ещё не сделали"} первый заказ
+              </div>
+            )}
+          </>
         )}
 
         <div className="ref-page__how">
