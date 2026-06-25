@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { getTg } from "../telegram";
+import { getTg, getInitData } from "../telegram";
 import { useI18n } from "../context/I18nContext";
 
 interface Props {
@@ -18,26 +17,13 @@ export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, onOpenRefe
     : "Гость";
   const username = user?.username ? `@${user.username}` : null;
 
-  const [supportUrl, setSupportUrl]       = useState("");
-  const [supportUserId, setSupportUserId] = useState("");
-
-  useEffect(() => {
-    fetch("/api/config")
-      .then(r => r.json())
-      .then(d => {
-        if (d.supportUrl)    setSupportUrl(d.supportUrl);
-        if (d.supportUserId) setSupportUserId(d.supportUserId);
-      })
-      .catch(() => {});
-  }, []);
-
-  const openSupport = () => {
+  const openSupport = async () => {
     const tg = getTg();
-    if (supportUrl && tg) {
-      tg.openTelegramLink(supportUrl);
-    } else if (supportUserId && tg) {
-      tg.openLink(`tg://openmessage?user_id=${supportUserId}`);
-    }
+    await fetch("/api/support/contact", {
+      method: "POST",
+      headers: { "x-telegram-init-data": getInitData() },
+    }).catch(() => {});
+    tg?.close();
   };
 
   const MENU = [
