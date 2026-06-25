@@ -1,16 +1,18 @@
 import { useCart } from "../context/CartContext";
+import { useI18n } from "../context/I18nContext";
 
 export function Cart({ onCheckout }: { onCheckout: () => void }) {
   const { items, setQty, total } = useCart();
+  const { t } = useI18n();
 
   if (items.length === 0) {
     return (
       <div>
-        <div className="cart-page__title">Корзина</div>
+        <div className="cart-page__title">{t.cart_title}</div>
         <div className="empty">
           <span className="empty__icon">🛒</span>
-          <div className="empty__title">Корзина пуста</div>
-          <p>Добавьте товары из каталога</p>
+          <div className="empty__title">{t.cart_empty_title}</div>
+          <p>{t.cart_empty_sub}</p>
         </div>
       </div>
     );
@@ -22,7 +24,7 @@ export function Cart({ onCheckout }: { onCheckout: () => void }) {
 
   return (
     <div>
-      <div className="cart-page__title">Корзина</div>
+      <div className="cart-page__title">{t.cart_title}</div>
 
       <div className="cart">
         {items.map((i) => {
@@ -58,27 +60,27 @@ export function Cart({ onCheckout }: { onCheckout: () => void }) {
 
       <div className="cart-summary">
         <div className="cart-summary__row">
-          <span>Товары ({totalQty})</span>
+          <span>{t.cart_items(totalQty)}</span>
           <span>{total} {currency}</span>
         </div>
         <div className="cart-summary__row">
-          <span>Доставка</span>
+          <span>{t.cart_delivery}</span>
           {freeShip
-            ? <span className="cart-summary__free">Бесплатно 🎁</span>
-            : <span className="cart-summary__note">рассчитывается при оформлении</span>
+            ? <span className="cart-summary__free">{t.cart_free}</span>
+            : <span className="cart-summary__note">{t.cart_calculated}</span>
           }
         </div>
         {!freeShip && (
           <div className="cart-summary__promo-note">
-            🎁 Добавь ещё {3 - totalQty} {3 - totalQty === 1 ? "товар" : "товара"} для бесплатной доставки
+            {t.cart_add_more(3 - totalQty)}
           </div>
         )}
         <div className="cart-summary__total">
-          <span className="cart-summary__total-label">Итого</span>
+          <span className="cart-summary__total-label">{t.cart_total}</span>
           <span className="cart-summary__total-val">{total} {currency}</span>
         </div>
         <button className="cart-checkout" onClick={onCheckout}>
-          Оформить заказ
+          {t.cart_checkout}
         </button>
       </div>
     </div>

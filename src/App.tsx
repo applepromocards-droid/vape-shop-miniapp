@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { CatalogProvider, useCatalog } from "./context/CatalogContext";
 import { CartProvider } from "./context/CartContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
+import { I18nProvider } from "./context/I18nContext";
 import { BottomNav, type Tab } from "./components/BottomNav";
 import { AgeGate, isAgeConfirmed } from "./components/AgeGate";
 import { Catalog } from "./pages/Catalog";
@@ -88,12 +89,14 @@ export default function App() {
   useEffect(() => { initTelegram(); }, []);
 
   return (
-    <CatalogProvider>
-      <CartProvider>
-        <FavoritesProvider>
-          <AppInner />
-        </FavoritesProvider>
-      </CartProvider>
-    </CatalogProvider>
+    <I18nProvider>
+      <CatalogProvider>
+        <CartProvider>
+          <FavoritesProvider>
+            <AppInner />
+          </FavoritesProvider>
+        </CartProvider>
+      </CatalogProvider>
+    </I18nProvider>
   );
 }

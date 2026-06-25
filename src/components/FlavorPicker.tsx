@@ -1,4 +1,5 @@
 import { useCart } from "../context/CartContext";
+import { useI18n } from "../context/I18nContext";
 import type { Flavor, Product } from "../types";
 import { haptic } from "../telegram";
 
@@ -9,6 +10,7 @@ interface Props {
 
 export function FlavorPicker({ product, onClose }: Props) {
   const { add, items } = useCart();
+  const { t } = useI18n();
 
   const getQty = (flavorId: string) =>
     items.find((i) => i.product.id === product.id && i.flavor?.id === flavorId)?.qty ?? 0;
@@ -22,10 +24,8 @@ export function FlavorPicker({ product, onClose }: Props) {
   return (
     <div className="flavor-overlay" onClick={onClose}>
       <div className="flavor-sheet" onClick={(e) => e.stopPropagation()}>
-        {/* Handle bar */}
         <div className="flavor-sheet__bar" />
 
-        {/* Product info */}
         <div className="flavor-sheet__head">
           <div className="flavor-sheet__product">
             <div className="flavor-sheet__thumb">
@@ -37,7 +37,7 @@ export function FlavorPicker({ product, onClose }: Props) {
             <div className="flavor-sheet__info">
               <div className="flavor-sheet__title">{product.title}</div>
               <div className="flavor-sheet__meta">
-                {product.puffs && <span>{product.puffs.toLocaleString()} затяжек · </span>}
+                {product.puffs && <span>{product.puffs.toLocaleString()} {t.puffs} · </span>}
                 <span>{product.price} {product.currency}</span>
               </div>
             </div>
@@ -45,10 +45,8 @@ export function FlavorPicker({ product, onClose }: Props) {
           <button className="flavor-sheet__close" onClick={onClose}>✕</button>
         </div>
 
-        {/* Divider */}
         <div className="flavor-sheet__divider" />
 
-        {/* Flavor list */}
         <div className="flavor-list">
           {(product.flavors ?? []).map((f) => {
             const qty = getQty(f.id);
@@ -61,7 +59,7 @@ export function FlavorPicker({ product, onClose }: Props) {
                     <button className="flavor-item__add" onClick={() => handleAdd(f)}>+</button>
                   </div>
                 ) : (
-                  <span className="flavor-item__none">Нет в наличии</span>
+                  <span className="flavor-item__none">{t.no_stock_flavor}</span>
                 )}
               </div>
             );

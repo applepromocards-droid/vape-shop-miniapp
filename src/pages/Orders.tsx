@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getInitData, getTg } from "../telegram";
+import { useI18n } from "../context/I18nContext";
 
 type OrderItem = { title: string; flavor?: string; qty: number; price: number; currency: string };
 type Order = {
@@ -15,15 +16,10 @@ type Order = {
   createdAt: string;
 };
 
-const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
-  new:       { label: "В обработке", cls: "order-status--new" },
-  done:      { label: "Выполнен",    cls: "order-status--done" },
-  cancelled: { label: "Отменён",     cls: "order-status--cancelled" },
-};
-
 export function Orders({ onClose }: { onClose: () => void }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, lang } = useI18n();
 
   useEffect(() => {
     const tg = getTg();
@@ -40,22 +36,28 @@ export function Orders({ onClose }: { onClose: () => void }) {
       .catch(() => setLoading(false));
   }, []);
 
+  const STATUS_LABEL = {
+    new:       { label: t.status_new,       cls: "order-status--new" },
+    done:      { label: t.status_done,      cls: "order-status--done" },
+    cancelled: { label: t.status_cancelled, cls: "order-status--cancelled" },
+  };
+
   return (
     <div className="orders-page">
       <div className="page-header">
         <button className="page-header__back" onClick={onClose}>‹</button>
-        <h1 className="page-header__title">Мои заказы</h1>
+        <h1 className="page-header__title">{t.orders_title}</h1>
       </div>
 
       {loading && (
-        <div className="empty"><span className="empty__icon">⏳</span><p>Загрузка...</p></div>
+        <div className="empty"><span className="empty__icon">⏳</span><p>{t.orders_loading}</p></div>
       )}
 
       {!loading && orders.length === 0 && (
         <div className="empty">
           <span className="empty__icon">📦</span>
-          <div className="empty__title">Заказов пока нет</div>
-          <p>Ваши заказы будут отображаться здесь</p>
+          <div className="empty__title">{t.orders_empty_title}</div>
+          <p>{t.orders_empty_sub}</p>
         </div>
       )}
 
@@ -66,11 +68,12 @@ export function Orders({ onClose }: { onClose: () => void }) {
           const freeShip = qty >= 3;
           const deliveryFee = order.delivery && !freeShip ? 10 : 0;
           const discount = order.discount ?? 0;
-          const total = order.subtotal + deliveryFee - discount;
+          const orderTotal = order.subtotal + deliveryFee - discount;
           const st = STATUS_LABEL[order.status] ?? STATUS_LABEL.new;
-          const date = new Date(order.createdAt).toLocaleDateString("ru-RU", {
-            day: "numeric", month: "long", hour: "2-digit", minute: "2-digit",
-          });
+          const date = new Date(order.createdAt).toLocaleDateString(
+            lang === "ru" ? "ru-RU" : "en-GB",
+            { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" },
+          );
 
           return (
             <div key={order.id} className="order-card">
@@ -94,12 +97,12 @@ export function Orders({ onClose }: { onClose: () => void }) {
               <div className="order-card__footer">
                 {order.delivery
                   ? <span className="order-card__meta">🚚 {order.address}</span>
-                  : <span className="order-card__meta">🏠 Самовывоз</span>
+                  : <span className="order-card__meta">🏠 {t.order_pickup}</span>
                 }
                 {discount > 0 && (
                   <span className="order-card__meta order-card__promo">🎟 {order.promoCode} −{discount} {currency}</span>
                 )}
-                <span className="order-card__total">Итого: {total} {currency}</span>
+                <span className="order-card__total">{t.order_total} {orderTotal} {currency}</span>
               </div>
             </div>
           );

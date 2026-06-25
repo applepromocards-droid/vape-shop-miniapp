@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { getInitData, haptic } from "../telegram";
+import { useI18n } from "../context/I18nContext";
 
 export function ReferralOnboarding({ onDone }: { onDone: () => void }) {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { t } = useI18n();
 
   const submit = async () => {
     const clean = username.replace(/^@/, "").trim();
@@ -29,11 +31,8 @@ export function ReferralOnboarding({ onDone }: { onDone: () => void }) {
   return (
     <div className="ref-onboarding">
       <div className="ref-onboarding__icon">🎁</div>
-      <div className="ref-onboarding__title">Тебя кто-то пригласил?</div>
-      <p className="ref-onboarding__sub">
-        Введи @username человека, который поделился с тобой магазином.
-        Они получат бонус за каждого приглашённого!
-      </p>
+      <div className="ref-onboarding__title">{t.ref_ob_title}</div>
+      <p className="ref-onboarding__sub">{t.ref_ob_sub}</p>
 
       <div className="ref-onboarding__input-wrap">
         <span className="ref-onboarding__at">@</span>
@@ -53,10 +52,10 @@ export function ReferralOnboarding({ onDone }: { onDone: () => void }) {
         disabled={loading}
         onClick={submit}
       >
-        {loading ? "Сохранение..." : "Подтвердить"}
+        {loading ? t.ref_ob_saving : t.ref_ob_confirm}
       </button>
       <button className="ref-onboarding__btn ref-onboarding__btn--skip" onClick={onDone}>
-        Пропустить
+        {t.ref_ob_skip}
       </button>
     </div>
   );

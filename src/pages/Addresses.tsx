@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getInitData, getTg } from "../telegram";
+import { useI18n } from "../context/I18nContext";
 
 export function Addresses({ onClose }: { onClose: () => void }) {
   const [addresses, setAddresses] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useI18n();
 
   useEffect(() => {
     const tg = getTg();
@@ -33,18 +35,18 @@ export function Addresses({ onClose }: { onClose: () => void }) {
     <div className="orders-page">
       <div className="page-header">
         <button className="page-header__back" onClick={onClose}>‹</button>
-        <h1 className="page-header__title">Адреса доставки</h1>
+        <h1 className="page-header__title">{t.addresses_title}</h1>
       </div>
 
       {loading && (
-        <div className="empty"><span className="empty__icon">⏳</span><p>Загрузка...</p></div>
+        <div className="empty"><span className="empty__icon">⏳</span><p>{t.addresses_loading}</p></div>
       )}
 
       {!loading && addresses.length === 0 && (
         <div className="empty">
           <span className="empty__icon">📍</span>
-          <div className="empty__title">Нет сохранённых адресов</div>
-          <p>Адреса сохраняются автоматически при оформлении доставки</p>
+          <div className="empty__title">{t.addresses_empty_title}</div>
+          <p>{t.addresses_empty_sub}</p>
         </div>
       )}
 

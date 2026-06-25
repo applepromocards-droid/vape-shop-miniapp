@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getTg } from "../telegram";
+import { useI18n } from "../context/I18nContext";
 
 interface Props {
   onOpenAdmin: () => void;
@@ -11,6 +12,7 @@ interface Props {
 
 export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, onOpenReferral, isAdmin }: Props) {
   const user = getTg()?.initDataUnsafe.user;
+  const { t } = useI18n();
   const name = user
     ? `${user.first_name}${user.last_name ? " " + user.last_name : ""}`
     : "Гость";
@@ -34,7 +36,6 @@ export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, onOpenRefe
     if (supportUrl && tg) {
       tg.openTelegramLink(supportUrl);
     } else if (supportUserId) {
-      // Open direct chat by Telegram user ID via native tg:// scheme
       window.open(`tg://user?id=${supportUserId}`, "_blank");
     } else if (tg) {
       tg.close();
@@ -42,10 +43,10 @@ export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, onOpenRefe
   };
 
   const MENU = [
-    { icon: "📦", label: "Мои заказы",              action: onOpenOrders },
-    { icon: "📍", label: "Адреса доставки",          action: onOpenAddresses },
-    { icon: "🔗", label: "Реферальная программа",   action: onOpenReferral },
-    { icon: "💬", label: "Поддержка",                action: openSupport },
+    { icon: "📦", label: t.profile_orders,    action: onOpenOrders },
+    { icon: "📍", label: t.profile_addresses,  action: onOpenAddresses },
+    { icon: "🔗", label: t.profile_referral,   action: onOpenReferral },
+    { icon: "💬", label: t.profile_support,    action: openSupport },
   ];
 
   return (
@@ -72,7 +73,7 @@ export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, onOpenRefe
           {isAdmin && (
             <button className="menu-item menu-item--admin" onClick={onOpenAdmin}>
               <span className="menu-item__icon">⚙️</span>
-              <span className="menu-item__label">Управление каталогом</span>
+              <span className="menu-item__label">{t.profile_admin}</span>
               <span className="menu-item__arrow">›</span>
             </button>
           )}

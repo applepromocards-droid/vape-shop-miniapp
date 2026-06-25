@@ -3,11 +3,13 @@ import { CategoryCard } from "../components/CategoryCard";
 import { ProductCard } from "../components/ProductCard";
 import { FlavorPicker } from "../components/FlavorPicker";
 import { useCatalog } from "../context/CatalogContext";
-import { getTg } from "../telegram";
+import { useI18n } from "../context/I18nContext";
+import { getTg, haptic } from "../telegram";
 import type { Product } from "../types";
 
 export function Catalog() {
   const { categories, productsByCategory, hero } = useCatalog();
+  const { lang, setLang, t } = useI18n();
   const [openCat, setOpenCat] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [pickerProduct, setPickerProduct] = useState<Product | null>(null);
@@ -36,22 +38,16 @@ export function Catalog() {
           <FlavorPicker product={pickerProduct} onClose={() => setPickerProduct(null)} />
         )}
         <div className="page-header">
-          <button className="page-header__back" onClick={() => setOpenCat(null)}>
-            ‹
-          </button>
+          <button className="page-header__back" onClick={() => setOpenCat(null)}>‹</button>
           <h1 className="page-header__title">{category.title} {category.subtitle}</h1>
         </div>
 
         <div className="prod-list">
           {products.length === 0 ? (
-            <p className="empty" style={{ gridColumn: "1/-1" }}>Скоро здесь появятся товары.</p>
+            <p className="empty" style={{ gridColumn: "1/-1" }}>{t.coming_soon}</p>
           ) : (
             products.map((p) => (
-              <ProductCard
-                key={p.id}
-                product={p}
-                onSelectFlavor={setPickerProduct}
-              />
+              <ProductCard key={p.id} product={p} onSelectFlavor={setPickerProduct} />
             ))
           )}
         </div>
@@ -72,14 +68,20 @@ export function Catalog() {
           </div>
           <div className="mm-header__name">MMSMOKE</div>
         </div>
-        <button className="mm-header__btn" aria-label="Избранное">♡</button>
+        <button
+          className="mm-header__btn mm-header__lang-toggle"
+          onClick={() => { haptic("light"); setLang(lang === "ru" ? "en" : "ru"); }}
+          aria-label="Toggle language"
+        >
+          {lang === "ru" ? "🇷🇺 RU" : "🇬🇧 EN"}
+        </button>
       </header>
 
       <div className="mm-search">
         <span className="mm-search__icon">⌕</span>
         <input
           className="mm-search__input"
-          placeholder="Поиск вкусов и устройств…"
+          placeholder={t.search_placeholder}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -108,8 +110,8 @@ export function Catalog() {
       )}
 
       <div className="mm-section">
-        <span className="mm-section__title">Категории</span>
-        <button className="mm-section__link">все →</button>
+        <span className="mm-section__title">{t.categories}</span>
+        <button className="mm-section__link">{t.all_link}</button>
       </div>
 
       <div className="cat-grid">

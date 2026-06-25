@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getInitData, haptic, getTg } from "../telegram";
+import { useI18n } from "../context/I18nContext";
 
 interface Stats {
   confirmed: number;
@@ -15,6 +16,7 @@ export function Referral({ onClose }: { onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const { t } = useI18n();
 
   const load = () =>
     fetch("/api/referrals/my", { headers: { "x-telegram-init-data": getInitData() } })
@@ -44,7 +46,7 @@ export function Referral({ onClose }: { onClose: () => void }) {
         load();
       }
     } catch {
-      setError("Ошибка сети");
+      setError(t.checkout_conn_error);
     } finally {
       setLoading(false);
     }
@@ -58,32 +60,26 @@ export function Referral({ onClose }: { onClose: () => void }) {
     <div className="ref-page">
       <div className="ref-page__header">
         <button className="ref-page__back" onClick={onClose}>‹</button>
-        <span className="ref-page__title">Реферальная программа</span>
+        <span className="ref-page__title">{t.ref_title}</span>
       </div>
 
-      {/* Hero */}
       <div className="ref-page__hero">
         <div className="ref-page__hero-icon">🎁</div>
-        <div className="ref-page__hero-text">Приведи 3 друга —<br />получи бесплатную курилку!</div>
+        <div className="ref-page__hero-text" style={{ whiteSpace: "pre-line" }}>{t.ref_hero}</div>
       </div>
 
-      {/* No username warning */}
       {noUsername && (
         <div className="ref-page__no-username">
           <div className="ref-page__no-username-icon">⚠️</div>
-          <div className="ref-page__no-username-title">Нет @username в Telegram</div>
-          <p className="ref-page__no-username-text">
-            Для участия в реферальной программе тебе нужен @username в Telegram.
-            Установи его в настройках Telegram, затем перезапусти приложение.
-          </p>
+          <div className="ref-page__no-username-title">{t.ref_no_username_title}</div>
+          <p className="ref-page__no-username-text">{t.ref_no_username_text}</p>
         </div>
       )}
 
-      {/* Progress */}
       <div className="ref-page__card">
-        <div className="ref-page__card-label">Твои рефералы</div>
+        <div className="ref-page__card-label">{t.ref_my}</div>
         {noUsername ? (
-          <div className="ref-page__disabled-hint">Недоступно без @username</div>
+          <div className="ref-page__disabled-hint">{t.ref_disabled}</div>
         ) : (
           <>
             <div className="ref-page__progress-row">
@@ -93,34 +89,33 @@ export function Referral({ onClose }: { onClose: () => void }) {
               <span className="ref-page__count">{confirmed}/3</span>
             </div>
             {stats?.rewardReady && (
-              <div className="ref-page__reward">🎁 Награда отправлена в Telegram!</div>
+              <div className="ref-page__reward">{t.ref_reward}</div>
             )}
             {!stats?.rewardReady && stats && stats.pending > 0 && (
-              <div className="ref-page__pending">
-                ⏳ {stats.pending} {stats.pending === 1 ? "друг ещё не сделал" : "друга ещё не сделали"} первый заказ
-              </div>
+              <div className="ref-page__pending">{t.ref_pending(stats.pending)}</div>
             )}
           </>
         )}
 
         <div className="ref-page__how">
-          <div className="ref-page__how-title">Как это работает?</div>
-          <div className="ref-page__how-step"><span>1</span> Скажи другу свой @username</div>
-          <div className="ref-page__how-step"><span>2</span> Он указывает тебя при первом запуске</div>
-          <div className="ref-page__how-step"><span>3</span> После его первого заказа тебе засчитается +1</div>
+          <div className="ref-page__how-title">{t.ref_how_title}</div>
+          <div className="ref-page__how-step"><span>1</span> {t.ref_how_1}</div>
+          <div className="ref-page__how-step"><span>2</span> {t.ref_how_2}</div>
+          <div className="ref-page__how-step"><span>3</span> {t.ref_how_3}</div>
         </div>
+
+        {myUsername && (
+          <div className="ref-page__share-tag">{t.ref_share(myUsername)}</div>
+        )}
       </div>
 
-      {/* Who invited me */}
       <div className="ref-page__card">
-        <div className="ref-page__card-label">Кто тебя пригласил?</div>
+        <div className="ref-page__card-label">{t.ref_who}</div>
 
         {stats?.invitedBy ? (
-          <div className="ref-page__set-by">
-            ✅ Указан <b>@{stats.invitedBy}</b>
-          </div>
+          <div className="ref-page__set-by">{t.ref_set_by(stats.invitedBy)}</div>
         ) : saved ? (
-          <div className="ref-page__set-by">✅ Сохранено!</div>
+          <div className="ref-page__set-by">{t.ref_saved}</div>
         ) : (
           <>
             <div className="ref-page__input-wrap">
@@ -140,11 +135,9 @@ export function Referral({ onClose }: { onClose: () => void }) {
               disabled={loading || !username.trim()}
               onClick={submit}
             >
-              {loading ? "Сохранение..." : "Сохранить"}
+              {loading ? t.ref_saving : t.ref_save}
             </button>
-            <p className="ref-page__note">
-              Указать можно только один раз. Засчитается после твоего первого завершённого заказа.
-            </p>
+            <p className="ref-page__note">{t.ref_note}</p>
           </>
         )}
       </div>

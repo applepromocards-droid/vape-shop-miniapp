@@ -1,6 +1,7 @@
 import type { Product } from "../types";
 import { useCart } from "../context/CartContext";
 import { useFavorites } from "../context/FavoritesContext";
+import { useI18n } from "../context/I18nContext";
 import { haptic } from "../telegram";
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 export function ProductCard({ product, onSelectFlavor }: Props) {
   const { add } = useCart();
   const { isFavorite, toggle } = useFavorites();
+  const { t } = useI18n();
 
   const hasFlavors = (product.flavors?.length ?? 0) > 0;
   const anyInStock = hasFlavors
@@ -42,7 +44,7 @@ export function ProductCard({ product, onSelectFlavor }: Props) {
           <div className="prod-card__flavors">
             {inStockCount > 0
               ? `${inStockCount} ${pluralFlavor(inStockCount)}`
-              : <span className="prod-card__no-stock">Нет в наличии</span>
+              : <span className="prod-card__no-stock">{t.out_of_stock}</span>
             }
           </div>
         ) : null}
@@ -54,7 +56,7 @@ export function ProductCard({ product, onSelectFlavor }: Props) {
               disabled={!anyInStock}
               onClick={() => onSelectFlavor?.(product)}
             >
-              Выбрать
+              {t.pick}
             </button>
           ) : (
             <button

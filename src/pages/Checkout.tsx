@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
+import { useI18n } from "../context/I18nContext";
 import { getTg, getInitData, haptic } from "../telegram";
 
 type Step = "delivery" | "payment" | "confirm";
@@ -8,12 +9,13 @@ type PaymentType = "cash" | "card";
 
 export function Checkout({ onClose }: { onClose: () => void }) {
   const { items, total, clear } = useCart();
+  const { t } = useI18n();
   const tg = getTg();
 
-  const [step, setStep]               = useState<Step>("delivery");
-  const [deliveryType, setDeliveryType] = useState<DeliveryType>("delivery");
-  const [address, setAddress]           = useState("");
-  const [payment, setPayment]           = useState<PaymentType>("cash");
+  const [step, setStep]                   = useState<Step>("delivery");
+  const [deliveryType, setDeliveryType]   = useState<DeliveryType>("delivery");
+  const [address, setAddress]             = useState("");
+  const [payment, setPayment]             = useState<PaymentType>("cash");
   const [savedAddresses, setSavedAddresses] = useState<string[]>([]);
   const [promoInput, setPromoInput]       = useState("");
   const [promoApplied, setPromoApplied]   = useState<{ code: string; type: string; value: number } | null>(null);
@@ -22,18 +24,17 @@ export function Checkout({ onClose }: { onClose: () => void }) {
   const [placing, setPlacing]             = useState(false);
   const [placed, setPlaced]               = useState(false);
 
-  const currency  = items[0]?.product.currency ?? "€";
-  const totalQty  = items.reduce((s, i) => s + i.qty, 0);
-  const freeShip  = totalQty >= 3 || promoApplied?.type === "free_delivery";
-  const shipFee   = deliveryType === "delivery" && !freeShip ? 10 : 0;
-  const discount  = promoApplied
+  const currency   = items[0]?.product.currency ?? "€";
+  const totalQty   = items.reduce((s, i) => s + i.qty, 0);
+  const freeShip   = totalQty >= 3 || promoApplied?.type === "free_delivery";
+  const shipFee    = deliveryType === "delivery" && !freeShip ? 10 : 0;
+  const discount   = promoApplied
     ? promoApplied.type === "fixed"   ? promoApplied.value
     : promoApplied.type === "percent" ? Math.round(total * promoApplied.value / 100)
     : 0
     : 0;
   const finalTotal = Math.max(0, total + shipFee - discount);
 
-  // Load saved addresses
   useEffect(() => {
     fetch("/api/orders/address", { headers: { "x-telegram-init-data": getInitData() } })
       .then(r => r.ok ? r.json() : null)
@@ -46,7 +47,6 @@ export function Checkout({ onClose }: { onClose: () => void }) {
       .catch(() => {});
   }, []);
 
-  // Telegram BackButton
   useEffect(() => {
     const back = tg?.BackButton;
     if (!back) return;
@@ -78,11 +78,11 @@ export function Checkout({ onClose }: { onClose: () => void }) {
         setPromoApplied({ code: data.code, type: data.type, value: data.value });
         setPromoError("");
       } else {
-        setPromoError(data.error ?? "Ошибка");
+        setPromoError(data.error ?? t.checkout_promo_error);
         setPromoApplied(null);
       }
     } catch {
-      setPromoError("Ошибка соединения");
+      setPromoError(t.checkout_conn_error);
     } finally {
       setPromoLoading(false);
     }
@@ -115,7 +115,7 @@ export function Checkout({ onClose }: { onClose: () => void }) {
       setPlaced(true);
       setTimeout(() => tg?.close(), 3500);
     } catch {
-      alert("Ошибка при оформлении, попробуйте ещё раз");
+      alert(t.checkout_order_error);
     } finally {
       setPlacing(false);
     }
@@ -126,8 +126,8 @@ export function Checkout({ onClose }: { onClose: () => void }) {
       <div className="checkout-success">
         <div className="checkout-success__ring" />
         <div className="checkout-success__icon">✅</div>
-        <div className="checkout-success__title">Заказ принят!</div>
-        <p className="checkout-success__sub">Администратор свяжется с вами в ближайшее время</p>
+        <div className="checkout-success__title">{t.checkout_success_title}</div>
+        <p className="checkout-success__sub">{t.checkout_success_sub}</p>
       </div>
     );
   }
@@ -137,7 +137,6 @@ export function Checkout({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="checkout">
-      {/* Header */}
       <div className="checkout__header">
         <button className="checkout__back" onClick={() => {
           haptic("light");
@@ -145,21 +144,19 @@ export function Checkout({ onClose }: { onClose: () => void }) {
           else if (step === "payment") setStep("delivery");
           else setStep("payment");
         }}>‹</button>
-        <span className="checkout__title">Оформление заказа</span>
+        <span className="checkout__title">{t.checkout_title}</span>
         <div style={{ width: 36 }} />
       </div>
 
-      {/* Step dots */}
       <div className="checkout__dots">
         {STEPS.map((s, i) => (
           <div key={s} className={`checkout__dot${i <= stepIdx ? " checkout__dot--active" : ""}`} />
         ))}
       </div>
 
-      {/* Step: delivery */}
       {step === "delivery" && (
         <div className="checkout__body">
-          <div className="checkout__label">Способ получения</div>
+          <div className="checkout__label">{t.checkout_delivery_method}</div>
 
           <div className="checkout__options">
             <button
@@ -167,22 +164,22 @@ export function Checkout({ onClose }: { onClose: () => void }) {
               onClick={() => { haptic("light"); setDeliveryType("delivery"); }}
             >
               <span className="checkout-option__icon">🚚</span>
-              <span className="checkout-option__name">Доставка</span>
-              <span className="checkout-option__sub">{freeShip ? "бесплатно" : "+10 €"}</span>
+              <span className="checkout-option__name">{t.checkout_delivery}</span>
+              <span className="checkout-option__sub">{freeShip ? t.checkout_free : "+10 €"}</span>
             </button>
             <button
               className={`checkout-option${deliveryType === "pickup" ? " checkout-option--active" : ""}`}
               onClick={() => { haptic("light"); setDeliveryType("pickup"); }}
             >
               <span className="checkout-option__icon">🏠</span>
-              <span className="checkout-option__name">Самовывоз</span>
-              <span className="checkout-option__sub">бесплатно</span>
+              <span className="checkout-option__name">{t.checkout_pickup}</span>
+              <span className="checkout-option__sub">{t.checkout_free}</span>
             </button>
           </div>
 
           {deliveryType === "delivery" && (
             <div className="checkout__address-wrap">
-              <div className="checkout__label" style={{ marginTop: 20 }}>Адрес доставки</div>
+              <div className="checkout__label" style={{ marginTop: 20 }}>{t.checkout_address_label}</div>
 
               {savedAddresses.length > 0 && (
                 <div className="checkout__addr-chips">
@@ -200,14 +197,12 @@ export function Checkout({ onClose }: { onClose: () => void }) {
 
               <textarea
                 className="checkout__address"
-                placeholder="Улица, дом, квартира"
+                placeholder={t.checkout_address_placeholder}
                 value={address}
                 onChange={e => setAddress(e.target.value)}
                 rows={3}
               />
-              <div className="checkout__delivery-note">
-                🎁 Доставка бесплатна при заказе от 3 товаров
-              </div>
+              <div className="checkout__delivery-note">{t.checkout_free_note}</div>
             </div>
           )}
 
@@ -216,15 +211,14 @@ export function Checkout({ onClose }: { onClose: () => void }) {
             disabled={deliveryType === "delivery" && !address.trim()}
             onClick={() => { haptic("light"); setStep("payment"); }}
           >
-            Далее →
+            {t.checkout_next}
           </button>
         </div>
       )}
 
-      {/* Step: payment */}
       {step === "payment" && (
         <div className="checkout__body">
-          <div className="checkout__label">Способ оплаты</div>
+          <div className="checkout__label">{t.checkout_payment}</div>
 
           <div className="checkout__options">
             <button
@@ -232,32 +226,31 @@ export function Checkout({ onClose }: { onClose: () => void }) {
               onClick={() => { haptic("light"); setPayment("cash"); }}
             >
               <span className="checkout-option__icon">💵</span>
-              <span className="checkout-option__name">Наличными</span>
-              <span className="checkout-option__sub">при получении</span>
+              <span className="checkout-option__name">{t.checkout_cash}</span>
+              <span className="checkout-option__sub">{t.checkout_on_delivery}</span>
             </button>
             <button
               className={`checkout-option${payment === "card" ? " checkout-option--active" : ""}`}
               onClick={() => { haptic("light"); setPayment("card"); }}
             >
               <span className="checkout-option__icon">💳</span>
-              <span className="checkout-option__name">Картой</span>
-              <span className="checkout-option__sub">при получении</span>
+              <span className="checkout-option__name">{t.checkout_card}</span>
+              <span className="checkout-option__sub">{t.checkout_on_delivery}</span>
             </button>
           </div>
 
-          {/* Promo code */}
           <div className="checkout__promo-wrap">
-            <div className="checkout__label" style={{ marginTop: 20 }}>Промокод</div>
+            <div className="checkout__label" style={{ marginTop: 20 }}>{t.checkout_promo_label}</div>
             {promoApplied ? (
               <div className="checkout__promo-applied">
-                <span>🎟 <b>{promoApplied.code}</b> — скидка применена</span>
+                <span>{t.checkout_promo_applied(promoApplied.code)}</span>
                 <button onClick={() => { setPromoApplied(null); setPromoInput(""); }}>✕</button>
               </div>
             ) : (
               <div className="checkout__promo-row">
                 <input
                   className="checkout__promo-input"
-                  placeholder="Введите промокод"
+                  placeholder={t.checkout_promo_placeholder}
                   value={promoInput}
                   onChange={e => { setPromoInput(e.target.value.toUpperCase()); setPromoError(""); }}
                 />
@@ -277,15 +270,14 @@ export function Checkout({ onClose }: { onClose: () => void }) {
             className="checkout__next"
             onClick={() => { haptic("light"); setStep("confirm"); }}
           >
-            Далее →
+            {t.checkout_next}
           </button>
         </div>
       )}
 
-      {/* Step: confirm */}
       {step === "confirm" && (
         <div className="checkout__body">
-          <div className="checkout__label">Ваш заказ</div>
+          <div className="checkout__label">{t.checkout_your_order}</div>
 
           <div className="checkout-summary">
             {items.map(i => (
@@ -304,31 +296,31 @@ export function Checkout({ onClose }: { onClose: () => void }) {
             <div className="checkout-summary__divider" />
 
             <div className="checkout-summary__row">
-              <span>Товары ({totalQty})</span>
+              <span>{t.cart_items(totalQty)}</span>
               <span>{total} {currency}</span>
             </div>
             {deliveryType === "delivery" && (
               <div className="checkout-summary__row">
-                <span>Доставка</span>
+                <span>{t.checkout_delivery}</span>
                 <span className={freeShip ? "checkout-summary__free" : ""}>
-                  {freeShip ? "бесплатно 🎁" : `+${shipFee} ${currency}`}
+                  {freeShip ? `${t.checkout_free} 🎁` : `+${shipFee} ${currency}`}
                 </span>
               </div>
             )}
             {deliveryType === "pickup" && (
               <div className="checkout-summary__row">
-                <span>Самовывоз</span>
-                <span className="checkout-summary__free">бесплатно</span>
+                <span>{t.checkout_pickup}</span>
+                <span className="checkout-summary__free">{t.checkout_free}</span>
               </div>
             )}
             {discount > 0 && (
               <div className="checkout-summary__row" style={{ color: "#4caf50" }}>
-                <span>🎟 Промокод {promoApplied?.code}</span>
+                <span>🎟 {promoApplied?.code}</span>
                 <span>−{discount} {currency}</span>
               </div>
             )}
             <div className="checkout-summary__total">
-              <span>Итого</span>
+              <span>{t.cart_total}</span>
               <span>{finalTotal} {currency}</span>
             </div>
 
@@ -337,9 +329,9 @@ export function Checkout({ onClose }: { onClose: () => void }) {
             <div className="checkout-summary__meta">
               {deliveryType === "delivery"
                 ? <span>📍 {address}</span>
-                : <span>🏠 Самовывоз</span>
+                : <span>🏠 {t.checkout_pickup}</span>
               }
-              <span>{payment === "cash" ? "💵 Наличными" : "💳 Картой"}</span>
+              <span>{payment === "cash" ? `💵 ${t.checkout_cash}` : `💳 ${t.checkout_card}`}</span>
             </div>
           </div>
 
@@ -348,7 +340,7 @@ export function Checkout({ onClose }: { onClose: () => void }) {
             disabled={placing}
             onClick={placeOrder}
           >
-            {placing ? "Оформляем..." : `Заказать · ${finalTotal} ${currency}`}
+            {placing ? t.checkout_placing : t.checkout_place(finalTotal, currency)}
           </button>
         </div>
       )}

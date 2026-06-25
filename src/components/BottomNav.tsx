@@ -1,4 +1,5 @@
 import { useCart } from "../context/CartContext";
+import { useI18n } from "../context/I18nContext";
 import { haptic } from "../telegram";
 
 export type Tab = "catalog" | "favorites" | "cart" | "profile";
@@ -10,14 +11,6 @@ function IconCatalog() {
       <rect x="13" y="3" width="8" height="8" rx="2" />
       <rect x="3" y="13" width="8" height="8" rx="2" />
       <rect x="13" y="13" width="8" height="8" rx="2" />
-    </svg>
-  );
-}
-
-function IconHeart() {
-  return (
-    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
-      <path d="M12 20.3l-1.45-1.32C5.4 14.36 2 11.28 2 7.5 2 4.42 4.42 2 7.5 2c1.74 0 3.41.81 4.5 2.09C13.09 2.81 14.76 2 16.5 2 19.58 2 22 4.42 22 7.5c0 3.78-3.4 6.86-8.55 11.54L12 20.3z" />
     </svg>
   );
 }
@@ -41,33 +34,44 @@ function IconProfile() {
   );
 }
 
-const TABS: { key: Tab; label: string; Icon: () => JSX.Element }[] = [
-  { key: "catalog",   label: "Каталог",   Icon: IconCatalog },
-  { key: "favorites", label: "Избранное", Icon: IconHeart },
-  { key: "cart",      label: "Корзина",   Icon: IconCart },
-  { key: "profile",   label: "Профиль",   Icon: IconProfile },
-];
-
 export function BottomNav({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) {
   const { count } = useCart();
+  const { lang, setLang, t } = useI18n();
+
+  const tabs = [
+    { key: "catalog" as Tab,   label: t.nav_catalog, Icon: IconCatalog },
+    { key: "cart"    as Tab,   label: t.nav_cart,    Icon: IconCart },
+    { key: "profile" as Tab,   label: t.nav_profile, Icon: IconProfile },
+  ];
+
+  const toggleLang = () => {
+    haptic("light");
+    setLang(lang === "ru" ? "en" : "ru");
+  };
 
   return (
     <nav className="bottom-nav">
-      {TABS.map((t) => (
+      {tabs.map((tab) => (
         <button
-          key={t.key}
-          className={`bottom-nav__item${active === t.key ? " is-active" : ""}`}
-          onClick={() => { haptic("light"); onChange(t.key); }}
+          key={tab.key}
+          className={`bottom-nav__item${active === tab.key ? " is-active" : ""}`}
+          onClick={() => { haptic("light"); onChange(tab.key); }}
         >
           <span className="bottom-nav__icon">
-            <t.Icon />
-            {t.key === "cart" && count > 0 && (
+            <tab.Icon />
+            {tab.key === "cart" && count > 0 && (
               <span className="bottom-nav__badge">{count}</span>
             )}
           </span>
-          <span>{t.label}</span>
+          <span>{tab.label}</span>
         </button>
       ))}
+
+      {/* Language toggle */}
+      <button className="bottom-nav__item bottom-nav__lang" onClick={toggleLang}>
+        <span className="bottom-nav__lang-icon">{lang === "ru" ? "🇷🇺" : "🇬🇧"}</span>
+        <span>{lang === "ru" ? "RU" : "EN"}</span>
+      </button>
     </nav>
   );
 }

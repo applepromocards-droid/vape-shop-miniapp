@@ -1566,3 +1566,28 @@ body {
 .ref-page__disabled-hint {
   font-size: 13px; color: var(--faint); padding: 4px 0 8px;
 }
+
+/* ── Language toggle ────────────────────── */
+.mm-header__lang-toggle {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: .03em;
+  color: var(--text) !important;
+  background: rgba(255,255,255,.07) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  border-radius: 10px !important;
+  padding: 5px 10px !important;
+  min-width: 60px;
+}
+.mm-header__lang-toggle:active { opacity: .7; }
+
+.bottom-nav__lang {
+  color: var(--muted);
+  font-size: 11px;
+}
+.bottom-nav__lang-icon { font-size: 20px; line-height: 1; }
+.bottom-nav__lang:active { opacity: .7; }
+
+.ref-page__share-tag {
+  font-size: 11px; color: var(--faint); margin-top: 10px; line-height: 1.4;
+}
