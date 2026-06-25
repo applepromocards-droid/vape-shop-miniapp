@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#1a0a00"/>
+      <stop offset="60%" stop-color="#0a0500"/>
+      <stop offset="100%" stop-color="#040200"/>
+    </radialGradient>
+    <radialGradient id="fireCore" cx="50%" cy="70%" r="60%">
+      <stop offset="0%" stop-color="#ffee44"/>
+      <stop offset="30%" stop-color="#ff8800"/>
+      <stop offset="65%" stop-color="#cc3300"/>
+      <stop offset="100%" stop-color="#660000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="flame1" x1="40%" y1="100%" x2="60%" y2="0%">
+      <stop offset="0%" stop-color="#ff6600"/>
+      <stop offset="50%" stop-color="#ffcc00"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="flame2" x1="40%" y1="100%" x2="55%" y2="0%">
+      <stop offset="0%" stop-color="#cc3300"/>
+      <stop offset="50%" stop-color="#ff8800"/>
+      <stop offset="100%" stop-color="#ffee44" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#b8841e"/>
+      <stop offset="50%" stop-color="#e7c879"/>
+      <stop offset="100%" stop-color="#b8841e"/>
+    </linearGradient>
+    <filter id="fireglow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="outerGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="30" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="800" fill="url(#bg)"/>
+
+  <!-- Orange ambient glow -->
+  <ellipse cx="300" cy="340" rx="180" ry="160" fill="#ff6600" opacity="0.15" filter="url(#outerGlow)"/>
+  <ellipse cx="300" cy="360" rx="90" ry="70" fill="url(#fireCore)" opacity="0.25"/>
+
+  <!-- Corner brackets -->
+  <path d="M 32 32 L 100 32 M 32 32 L 32 100" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+  <path d="M 568 32 L 500 32 M 568 32 L 568 100" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+  <path d="M 32 768 L 100 768 M 32 768 L 32 700" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+  <path d="M 568 768 L 500 768 M 568 768 L 568 700" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+
+  <!-- Concentric power rings -->
+  <circle cx="300" cy="310" r="155" stroke="#ff6600" stroke-width="1" fill="none" opacity="0.15"/>
+  <circle cx="300" cy="310" r="125" stroke="#ff8800" stroke-width="0.8" fill="none" opacity="0.18"/>
+  <circle cx="300" cy="310" r="95"  stroke="#ffaa00" stroke-width="0.8" fill="none" opacity="0.22"/>
+
+  <!-- Flame shape (main) -->
+  <g filter="url(#fireglow)">
+    <!-- Outer flame -->
+    <path d="M 300 460
+             C 240 420 175 370 195 295
+             C 210 235 255 240 265 190
+             C 275 145 290 120 300 148
+             C 310 120 325 145 335 190
+             C 345 240 390 235 405 295
+             C 425 370 360 420 300 460 Z"
+          fill="url(#flame2)" opacity="0.85"/>
+    <!-- Inner flame -->
+    <path d="M 300 435
+             C 262 405 228 370 242 310
+             C 252 265 278 265 285 232
+             C 292 202 300 185 300 208
+             C 308 185 316 202 323 232
+             C 330 265 356 265 366 310
+             C 380 370 346 405 300 435 Z"
+          fill="url(#flame1)" opacity="0.92"/>
+    <!-- Core highlight -->
+    <path d="M 300 400
+             C 280 382 270 355 278 330
+             C 284 312 295 312 300 295
+             C 305 312 316 312 322 330
+             C 330 355 320 382 300 400 Z"
+          fill="#ffffff" opacity="0.55"/>
+  </g>
+
+  <!-- Horizontal rule -->
+  <line x1="60" y1="512" x2="540" y2="512" stroke="#e7c87940" stroke-width="1"/>
+
+  <!-- Brand name -->
+  <text x="300" y="568"
+        font-family="'Arial Black','Arial',sans-serif"
+        font-weight="900" font-size="66" fill="#ffffff"
+        text-anchor="middle" letter-spacing="10">WAKA</text>
+
+  <!-- Gold line -->
+  <line x1="130" y1="585" x2="470" y2="585" stroke="url(#gold)" stroke-width="1.5" opacity="0.7"/>
+
+  <!-- Subtitle -->
+  <text x="300" y="622"
+        font-family="Arial,sans-serif" font-size="17"
+        fill="#e7c879" text-anchor="middle" letter-spacing="5" opacity="0.85">60 000 PUFFS • VOJO</text>
+
+  <!-- Bottom dots -->
+  <circle cx="278" cy="655" r="2.5" fill="#ff6600" opacity="0.8"/>
+  <circle cx="300" cy="655" r="2.5" fill="#e7c879" opacity="0.9"/>
+  <circle cx="322" cy="655" r="2.5" fill="#ff6600" opacity="0.8"/>
+</svg>

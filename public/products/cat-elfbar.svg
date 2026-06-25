@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#2a0b0d"/>
+      <stop offset="100%" stop-color="#060304"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5d96a"/>
+      <stop offset="50%" stop-color="#e7c879"/>
+      <stop offset="100%" stop-color="#b8841e"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="0%" y1="0%" x2="60%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#f5d96a"/>
+      <stop offset="100%" stop-color="#cc962b"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="24" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="800" fill="url(#bg)"/>
+
+  <!-- Red ambient glow -->
+  <ellipse cx="300" cy="310" rx="220" ry="200" fill="#c9302c" opacity="0.10" filter="url(#softglow)"/>
+
+  <!-- Corner bracket TL -->
+  <path d="M 32 32 L 100 32" stroke="#e7c87960" stroke-width="1.5" fill="none"/>
+  <path d="M 32 32 L 32 100" stroke="#e7c87960" stroke-width="1.5" fill="none"/>
+  <!-- Corner bracket TR -->
+  <path d="M 568 32 L 500 32" stroke="#e7c87960" stroke-width="1.5" fill="none"/>
+  <path d="M 568 32 L 568 100" stroke="#e7c87960" stroke-width="1.5" fill="none"/>
+  <!-- Corner bracket BL -->
+  <path d="M 32 768 L 100 768" stroke="#e7c87960" stroke-width="1.5" fill="none"/>
+  <path d="M 32 768 L 32 700" stroke="#e7c87960" stroke-width="1.5" fill="none"/>
+  <!-- Corner bracket BR -->
+  <path d="M 568 768 L 500 768" stroke="#e7c87960" stroke-width="1.5" fill="none"/>
+  <path d="M 568 768 L 568 700" stroke="#e7c87960" stroke-width="1.5" fill="none"/>
+
+  <!-- Smoke wisps -->
+  <path d="M 300 160 Q 280 200 300 240 Q 320 280 300 320 Q 280 360 300 400"
+        stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.08" stroke-dasharray="4 6"/>
+  <path d="M 270 180 Q 255 215 270 250 Q 285 285 270 315"
+        stroke="#ffffff" stroke-width="1" fill="none" opacity="0.05" stroke-dasharray="3 7"/>
+  <path d="M 330 175 Q 348 215 330 255 Q 312 295 330 330"
+        stroke="#ffffff" stroke-width="1" fill="none" opacity="0.05" stroke-dasharray="3 7"/>
+
+  <!-- Lightning bolt (central graphic) -->
+  <g filter="url(#glow)">
+    <path d="M 330 148 L 258 315 L 305 315 L 268 460 L 348 278 L 299 278 Z"
+          fill="url(#bolt)" opacity="0.95"/>
+  </g>
+
+  <!-- Gold halo behind bolt -->
+  <ellipse cx="300" cy="305" rx="55" ry="90" fill="#e7c879" opacity="0.07"/>
+
+  <!-- Horizontal rule top -->
+  <line x1="60" y1="510" x2="540" y2="510" stroke="#e7c87945" stroke-width="1"/>
+
+  <!-- Brand name -->
+  <text x="300" y="568"
+        font-family="'Arial Black','Arial',sans-serif"
+        font-weight="900" font-size="66" fill="#ffffff"
+        text-anchor="middle" letter-spacing="10">ELF BAR</text>
+
+  <!-- Gold line under name -->
+  <line x1="130" y1="585" x2="470" y2="585" stroke="url(#gold)" stroke-width="1.5" opacity="0.7"/>
+
+  <!-- Subtitle -->
+  <text x="300" y="622"
+        font-family="Arial,sans-serif" font-size="17"
+        fill="#e7c879" text-anchor="middle" letter-spacing="5" opacity="0.85">25 000 – 40 000 PUFFS</text>
+
+  <!-- Bottom dots -->
+  <circle cx="278" cy="655" r="2.5" fill="#c9302c" opacity="0.6"/>
+  <circle cx="300" cy="655" r="2.5" fill="#e7c879" opacity="0.8"/>
+  <circle cx="322" cy="655" r="2.5" fill="#c9302c" opacity="0.6"/>
+</svg>

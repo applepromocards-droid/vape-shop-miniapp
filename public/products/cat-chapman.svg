@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0e0a06"/>
+      <stop offset="50%" stop-color="#130c07"/>
+      <stop offset="100%" stop-color="#080504"/>
+    </linearGradient>
+    <linearGradient id="stripe1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6b3a1a" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#8b4a22" stop-opacity="0.6"/>
+      <stop offset="70%" stop-color="#8b4a22" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#6b3a1a" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#b8841e"/>
+      <stop offset="50%" stop-color="#e7c879"/>
+      <stop offset="100%" stop-color="#b8841e"/>
+    </linearGradient>
+    <linearGradient id="goldVert" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5d96a"/>
+      <stop offset="50%" stop-color="#cc962b"/>
+      <stop offset="100%" stop-color="#8b6218"/>
+    </linearGradient>
+    <radialGradient id="warmGlow" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#7a3a10"/>
+      <stop offset="100%" stop-color="#0e0a06" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softglow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="800" fill="url(#bg)"/>
+  <rect width="600" height="800" fill="url(#warmGlow)" opacity="0.6"/>
+
+  <!-- Warm horizontal stripes (classic cigarette pack aesthetic) -->
+  <rect x="0" y="200" width="600" height="18" fill="url(#stripe1)" opacity="0.5"/>
+  <rect x="0" y="228" width="600" height="10" fill="url(#stripe1)" opacity="0.3"/>
+  <rect x="0" y="348" width="600" height="18" fill="url(#stripe1)" opacity="0.5"/>
+  <rect x="0" y="366" width="600" height="10" fill="url(#stripe1)" opacity="0.3"/>
+
+  <!-- Corner brackets -->
+  <path d="M 32 32 L 100 32 M 32 32 L 32 100" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+  <path d="M 568 32 L 500 32 M 568 32 L 568 100" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+  <path d="M 32 768 L 100 768 M 32 768 L 32 700" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+  <path d="M 568 768 L 500 768 M 568 768 L 568 700" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+
+  <!-- Elegant oval frame -->
+  <ellipse cx="300" cy="300" rx="175" ry="150"
+           stroke="url(#gold)" stroke-width="1.5" fill="none" opacity="0.5" filter="url(#softglow)"/>
+  <ellipse cx="300" cy="300" rx="155" ry="130"
+           stroke="#e7c879" stroke-width="0.8" fill="none" opacity="0.25"/>
+
+  <!-- Cigarette silhouette (elegant, minimal) -->
+  <g filter="url(#softglow)">
+    <!-- Left cigarette -->
+    <rect x="202" y="228" width="20" height="144" rx="10" fill="#f5e8c8" opacity="0.75"/>
+    <rect x="202" y="228" width="20" height="22" rx="10" fill="#cc962b" opacity="0.9"/>
+    <!-- Middle cigarette (taller) -->
+    <rect x="290" y="200" width="20" height="172" rx="10" fill="#f5e8c8" opacity="0.9"/>
+    <rect x="290" y="200" width="20" height="24" rx="10" fill="#e7c879" opacity="1"/>
+    <!-- Right cigarette -->
+    <rect x="378" y="228" width="20" height="144" rx="10" fill="#f5e8c8" opacity="0.75"/>
+    <rect x="378" y="228" width="20" height="22" rx="10" fill="#cc962b" opacity="0.9"/>
+    <!-- Filter tips at bottom -->
+    <rect x="202" y="350" width="20" height="22" rx="4" fill="#c87840" opacity="0.85"/>
+    <rect x="290" y="350" width="20" height="22" rx="4" fill="#cc962b" opacity="0.95"/>
+    <rect x="378" y="350" width="20" height="22" rx="4" fill="#c87840" opacity="0.85"/>
+  </g>
+
+  <!-- Thin smoke lines from top -->
+  <path d="M 212 228 Q 205 200 212 175 Q 219 155 212 135"
+        stroke="#ffffff" stroke-width="1" fill="none" opacity="0.12" stroke-dasharray="3 5"/>
+  <path d="M 300 200 Q 293 170 300 148 Q 307 128 300 110"
+        stroke="#ffffff" stroke-width="1.2" fill="none" opacity="0.15" stroke-dasharray="3 5"/>
+  <path d="M 388 228 Q 395 200 388 175 Q 381 155 388 135"
+        stroke="#ffffff" stroke-width="1" fill="none" opacity="0.12" stroke-dasharray="3 5"/>
+
+  <!-- Horizontal rule -->
+  <line x1="60" y1="512" x2="540" y2="512" stroke="#e7c87940" stroke-width="1"/>
+
+  <!-- Brand name -->
+  <text x="300" y="570"
+        font-family="'Georgia','Times New Roman',serif"
+        font-weight="700" font-size="62" fill="#ffffff"
+        text-anchor="middle" letter-spacing="6">CHAPMAN</text>
+
+  <!-- Gold line -->
+  <line x1="90" y1="588" x2="510" y2="588" stroke="url(#gold)" stroke-width="1.5" opacity="0.65"/>
+
+  <!-- Subtitle -->
+  <text x="300" y="624"
+        font-family="Arial,sans-serif" font-size="16"
+        fill="#e7c879" text-anchor="middle" letter-spacing="6" opacity="0.8">FILTER CIGARETTES</text>
+
+  <!-- Bottom dots -->
+  <circle cx="278" cy="657" r="2.5" fill="#cc962b" opacity="0.7"/>
+  <circle cx="300" cy="657" r="2.5" fill="#e7c879" opacity="0.9"/>
+  <circle cx="322" cy="657" r="2.5" fill="#cc962b" opacity="0.7"/>
+</svg>

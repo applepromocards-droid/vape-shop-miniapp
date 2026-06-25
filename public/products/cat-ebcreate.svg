@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#0d1a2a"/>
+      <stop offset="60%" stop-color="#060a10"/>
+      <stop offset="100%" stop-color="#030507"/>
+    </radialGradient>
+    <linearGradient id="gem" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0f0ff"/>
+      <stop offset="30%" stop-color="#a8d8ff"/>
+      <stop offset="70%" stop-color="#e7c879"/>
+      <stop offset="100%" stop-color="#b8841e"/>
+    </linearGradient>
+    <linearGradient id="gemShade" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6fbfff" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#0055a5" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#b8841e"/>
+      <stop offset="50%" stop-color="#e7c879"/>
+      <stop offset="100%" stop-color="#b8841e"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="blueglow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="800" fill="url(#bg)"/>
+
+  <!-- Blue ambient glow -->
+  <ellipse cx="300" cy="300" rx="200" ry="180" fill="#1a5aaa" opacity="0.12" filter="url(#blueglow)"/>
+  <ellipse cx="300" cy="300" rx="100" ry="90" fill="#4488dd" opacity="0.08"/>
+
+  <!-- Corner brackets -->
+  <path d="M 32 32 L 100 32 M 32 32 L 32 100" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+  <path d="M 568 32 L 500 32 M 568 32 L 568 100" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+  <path d="M 32 768 L 100 768 M 32 768 L 32 700" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+  <path d="M 568 768 L 500 768 M 568 768 L 568 700" stroke="#e7c87950" stroke-width="1.5" fill="none"/>
+
+  <!-- Diamond / gem shape -->
+  <g filter="url(#glow)">
+    <!-- Main diamond -->
+    <polygon points="300,148 410,285 300,460 190,285"
+             fill="url(#gem)" opacity="0.9"/>
+    <!-- Inner facets -->
+    <polygon points="300,148 410,285 300,300 190,285"
+             fill="url(#gemShade)" opacity="0.5"/>
+    <line x1="300" y1="148" x2="300" y2="460" stroke="#ffffff" stroke-width="0.8" opacity="0.3"/>
+    <line x1="190" y1="285" x2="410" y2="285" stroke="#ffffff" stroke-width="0.8" opacity="0.3"/>
+    <line x1="245" y1="217" x2="355" y2="217" stroke="#ffffff" stroke-width="0.5" opacity="0.2"/>
+    <line x1="245" y1="355" x2="355" y2="355" stroke="#ffffff" stroke-width="0.5" opacity="0.2"/>
+  </g>
+
+  <!-- Horizontal rule -->
+  <line x1="60" y1="510" x2="540" y2="510" stroke="#e7c87940" stroke-width="1"/>
+
+  <!-- Brand name -->
+  <text x="300" y="565"
+        font-family="'Arial Black','Arial',sans-serif"
+        font-weight="900" font-size="52" fill="#ffffff"
+        text-anchor="middle" letter-spacing="6">EBCREATE</text>
+
+  <!-- Gold line -->
+  <line x1="100" y1="582" x2="500" y2="582" stroke="url(#gold)" stroke-width="1.5" opacity="0.7"/>
+
+  <!-- Subtitle -->
+  <text x="300" y="618"
+        font-family="Arial,sans-serif" font-size="17"
+        fill="#e7c879" text-anchor="middle" letter-spacing="5" opacity="0.85">40 000 PUFFS • PRO</text>
+
+  <!-- Bottom accent -->
+  <circle cx="278" cy="652" r="2.5" fill="#4488dd" opacity="0.7"/>
+  <circle cx="300" cy="652" r="2.5" fill="#e7c879" opacity="0.9"/>
+  <circle cx="322" cy="652" r="2.5" fill="#4488dd" opacity="0.7"/>
+</svg>
