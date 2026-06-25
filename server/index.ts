@@ -5,6 +5,8 @@ import { categoriesRouter } from "./routes/categories.js";
 import { productsRouter } from "./routes/products.js";
 import { heroRouter } from "./routes/hero.js";
 import { resetRouter } from "./routes/reset.js";
+import { botRouter } from "./routes/bot.js";
+import { authRouter } from "./routes/auth.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -16,6 +18,8 @@ app.use("/api/categories", categoriesRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/hero", heroRouter);
 app.use("/api/reset", resetRouter);
+app.use("/api/bot", botRouter);
+app.use("/api/auth", authRouter);
 
 // Serve built React app in production
 if (process.env.NODE_ENV === "production") {
