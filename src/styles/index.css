@@ -1217,3 +1217,105 @@ body {
 .checkout-success__icon { font-size: 64px; position: relative; }
 .checkout-success__title { font-size: 26px; font-weight: 800; position: relative; }
 .checkout-success__sub { font-size: 15px; color: var(--muted); position: relative; max-width: 260px; line-height: 1.5; }
+
+/* ─── Promo code in checkout ─────────────────────────────── */
+.checkout__promo-wrap { margin-top: 4px; }
+.checkout__promo-row { display: flex; gap: 8px; }
+.checkout__promo-input {
+  flex: 1; background: var(--card); border: 1.5px solid var(--border-r-med);
+  border-radius: 12px; padding: 12px 14px; color: var(--text);
+  font-family: inherit; font-size: 14px; outline: none; letter-spacing: .06em;
+}
+.checkout__promo-input:focus { border-color: var(--gold); }
+.checkout__promo-input::placeholder { color: var(--faint); letter-spacing: 0; }
+.checkout__promo-btn {
+  background: var(--gold); color: #0d0809; border: none; border-radius: 12px;
+  padding: 0 18px; font-weight: 700; font-family: inherit; font-size: 14px; cursor: pointer;
+}
+.checkout__promo-btn:disabled { opacity: 0.4; cursor: default; }
+.checkout__promo-applied {
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(76,175,80,.1); border: 1px solid rgba(76,175,80,.3);
+  border-radius: 12px; padding: 12px 14px; font-size: 14px; color: #4caf50;
+}
+.checkout__promo-applied button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; }
+.checkout__promo-error { font-size: 12px; color: var(--red); margin-top: 6px; }
+
+/* ─── Orders page ────────────────────────────────────────── */
+.orders-page { min-height: 100dvh; background: var(--bg); }
+.orders-list { padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+.order-card {
+  background: var(--card); border: 1px solid var(--border-r);
+  border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+}
+.order-card__header { display: flex; justify-content: space-between; align-items: center; }
+.order-card__id { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .06em; }
+.order-card__date { font-size: 11px; color: var(--faint); }
+.order-card__items { display: flex; flex-direction: column; gap: 4px; }
+.order-card__item { display: flex; justify-content: space-between; font-size: 13px; }
+.order-card__item-name { color: var(--text); }
+.order-card__item-flavor { color: var(--muted); }
+.order-card__item-price { color: var(--gold); font-weight: 600; white-space: nowrap; margin-left: 8px; }
+.order-card__footer { display: flex; flex-direction: column; gap: 3px; border-top: 1px solid var(--border-r); padding-top: 8px; }
+.order-card__meta { font-size: 12px; color: var(--muted); }
+.order-card__promo { color: #4caf50; }
+.order-card__total { font-size: 14px; font-weight: 700; color: var(--text); }
+.order-status { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+.order-status--new       { background: rgba(231,200,121,.12); color: var(--gold); }
+.order-status--done      { background: rgba(76,175,80,.12);   color: #4caf50; }
+.order-status--cancelled { background: rgba(201,48,44,.12);   color: var(--red); }
+
+/* ─── Addresses page ─────────────────────────────────────── */
+.addr-list { padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 10px; }
+.addr-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card); border: 1px solid var(--border-r);
+  border-radius: 14px; padding: 14px;
+}
+.addr-item__icon { font-size: 20px; flex-shrink: 0; }
+.addr-item__text { flex: 1; font-size: 14px; line-height: 1.4; }
+.addr-item__del { background: none; border: none; color: var(--faint); cursor: pointer; font-size: 18px; padding: 4px; }
+
+/* ─── Admin scrollable tabs ──────────────────────────────── */
+.admin-tabs--scroll { overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap; white-space: nowrap; }
+.admin-tabs--scroll::-webkit-scrollbar { display: none; }
+
+/* ─── Admin promo form ───────────────────────────────────── */
+.admin-promo-form {
+  background: var(--card-alt); border: 1px solid var(--border-r);
+  border-radius: 14px; padding: 14px; margin-bottom: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+/* ─── Admin order cards ──────────────────────────────────── */
+.admin-order-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
+.admin-order-filter {
+  background: var(--card); border: 1px solid var(--border-r); border-radius: 20px;
+  padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--muted);
+  cursor: pointer; white-space: nowrap; font-family: inherit;
+}
+.admin-order-filter.is-active { border-color: var(--red); color: var(--text); background: rgba(201,48,44,.1); }
+
+.admin-order-card {
+  background: var(--card); border: 1px solid var(--border-r);
+  border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 10px;
+}
+.admin-order-card--done      { border-color: rgba(76,175,80,.3); }
+.admin-order-card--cancelled { border-color: rgba(201,48,44,.3); opacity: .7; }
+.admin-order-card__header { display: flex; justify-content: space-between; }
+.admin-order-card__id { font-weight: 700; font-size: 13px; letter-spacing: .05em; }
+.admin-order-card__date { font-size: 11px; color: var(--faint); }
+.admin-order-card__who { font-size: 13px; color: var(--gold); font-weight: 600; }
+.admin-order-card__items { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.admin-order-card__meta { font-size: 12px; color: var(--muted); border-top: 1px solid var(--border-r); padding-top: 6px; }
+.admin-order-card__actions { display: flex; gap: 8px; margin-top: 4px; }
+.admin-order-btn {
+  flex: 1; padding: 10px; border-radius: 10px; border: none;
+  font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.admin-order-btn--done   { background: rgba(76,175,80,.15); color: #4caf50; }
+.admin-order-btn--cancel { background: rgba(201,48,44,.12); color: var(--red); }
+.admin-order-badge { text-align: center; font-size: 12px; font-weight: 700; padding: 6px; border-radius: 8px; }
+.admin-order-badge--done      { background: rgba(76,175,80,.1);  color: #4caf50; }
+.admin-order-badge--cancelled { background: rgba(201,48,44,.1);  color: var(--red); }

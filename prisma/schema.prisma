@@ -52,9 +52,21 @@ model Order {
   delivery   Boolean  @default(false)
   address    String?
   payment    String   @default("cash")
+  promoCode  String?
+  discount   Float?
   status     String   @default("new")
   createdAt  DateTime @default(now())
   @@index([tgUserId])
+}
+
+model PromoCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  type      String   // "free_delivery" | "fixed" | "percent"
+  value     Float    @default(0)
+  minOrder  Float?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
 }
 
 model Address {

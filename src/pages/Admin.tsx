@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import type { Category, Flavor, Hero, Product } from "../types";
 import { useCatalog } from "../context/CatalogContext";
+import { getInitData } from "../telegram";
 
-type Mode = "cats" | "prods" | "banner" | "cat-form" | "prod-form";
+type Mode = "cats" | "prods" | "banner" | "cat-form" | "prod-form" | "promos" | "orders";
 
 type CatForm = { id?: string; title: string; subtitle: string; emoji: string; image?: string };
 type ProdForm = {
@@ -63,6 +64,19 @@ export function Admin({ onClose }: { onClose: () => void }) {
 
   const [mode, setMode] = useState<Mode>("cats");
   const [returnMode, setReturnMode] = useState<Mode>("prods");
+
+  // Promos state
+  type Promo = { id: string; code: string; type: string; value: number; minOrder: number | null; active: boolean };
+  const [promos, setPromos] = useState<Promo[]>([]);
+  const [promoForm, setPromoForm] = useState({ code: "", type: "free_delivery", value: "", minOrder: "" });
+  const [promoLoading, setPromoLoading] = useState(false);
+
+  // Orders state
+  type OrderItem = { title: string; flavor?: string; qty: number; price: number; currency: string };
+  type AdminOrder = { id: string; tgName: string | null; tgUsername: string | null; tgUserId: string; items: OrderItem[]; subtotal: number; delivery: boolean; address: string | null; payment: string; promoCode: string | null; discount: number | null; status: string; createdAt: string };
+  const [adminOrders, setAdminOrders] = useState<AdminOrder[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersFilter, setOrdersFilter] = useState<"all" | "new" | "done" | "cancelled">("all");
   const [catForm, setCatForm] = useState<CatForm>(BLANK_CAT);
   const [prodForm, setProdForm] = useState<ProdForm>(blankProd());
   const [heroForm, setHeroForm] = useState<HeroForm>({
@@ -270,6 +284,49 @@ export function Admin({ onClose }: { onClose: () => void }) {
     });
   };
 
+  /* ── Promos ── */
+  const loadPromos = async () => {
+    const data = await fetch("/api/promos", { headers: { "x-telegram-init-data": getInitData() } }).then(r => r.json());
+    setPromos(data);
+  };
+  const createPromo = async () => {
+    if (!promoForm.code.trim()) return;
+    setPromoLoading(true);
+    await fetch("/api/promos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
+      body: JSON.stringify({
+        code: promoForm.code,
+        type: promoForm.type,
+        value: Number(promoForm.value) || 0,
+        minOrder: promoForm.minOrder ? Number(promoForm.minOrder) : null,
+      }),
+    });
+    setPromoForm({ code: "", type: "free_delivery", value: "", minOrder: "" });
+    await loadPromos();
+    setPromoLoading(false);
+  };
+  const deletePromo = async (id: string) => {
+    await fetch(`/api/promos/${id}`, { method: "DELETE", headers: { "x-telegram-init-data": getInitData() } });
+    setPromos(prev => prev.filter(p => p.id !== id));
+  };
+
+  /* ── Orders (admin) ── */
+  const loadOrders = async () => {
+    setOrdersLoading(true);
+    const data = await fetch("/api/orders/all", { headers: { "x-telegram-init-data": getInitData() } }).then(r => r.json());
+    setAdminOrders(data);
+    setOrdersLoading(false);
+  };
+  const updateOrderStatus = async (id: string, status: "done" | "cancelled") => {
+    await fetch(`/api/orders/${id}/status`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
+      body: JSON.stringify({ status }),
+    });
+    setAdminOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+  };
+
   /* ── Back logic ── */
   const handleBack = () => {
     if (mode === "cat-form") { setMode("cats"); return; }
@@ -292,13 +349,13 @@ export function Admin({ onClose }: { onClose: () => void }) {
       </div>
 
       {/* Tab switcher */}
-      {(mode === "cats" || mode === "prods" || mode === "banner") && (
-        <div className="admin-tabs">
+      {(mode === "cats" || mode === "prods" || mode === "banner" || mode === "promos" || mode === "orders") && (
+        <div className="admin-tabs admin-tabs--scroll">
           <button className={`admin-tab${mode === "cats" ? " is-active" : ""}`} onClick={() => setMode("cats")}>
-            Категории <span className="admin-tab__count">{categories.length}</span>
+            Категории
           </button>
           <button className={`admin-tab${mode === "prods" ? " is-active" : ""}`} onClick={() => setMode("prods")}>
-            Товары <span className="admin-tab__count">{products.length}</span>
+            Товары
           </button>
           <button className={`admin-tab${mode === "banner" ? " is-active" : ""}`} onClick={() => {
             if (hero.image) {
@@ -310,6 +367,12 @@ export function Admin({ onClose }: { onClose: () => void }) {
             setMode("banner");
           }}>
             Новинки
+          </button>
+          <button className={`admin-tab${mode === "promos" ? " is-active" : ""}`} onClick={() => { setMode("promos"); loadPromos(); }}>
+            Промокоды
+          </button>
+          <button className={`admin-tab${mode === "orders" ? " is-active" : ""}`} onClick={() => { setMode("orders"); loadOrders(); }}>
+            Заказы
           </button>
         </div>
       )}
@@ -767,6 +830,123 @@ export function Admin({ onClose }: { onClose: () => void }) {
               Сохранить
             </button>
           </div>
+        </div>
+      )}
+      {/* ─── Promo codes ─── */}
+      {mode === "promos" && (
+        <div className="admin-list">
+          <div className="admin-promo-form">
+            <div className="admin-label">Новый промокод</div>
+            <input className="admin-input" placeholder="Код (напр. SALE10)" value={promoForm.code}
+              onChange={e => setPromoForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} />
+            <select className="admin-input admin-select" value={promoForm.type}
+              onChange={e => setPromoForm(f => ({ ...f, type: e.target.value }))}>
+              <option value="free_delivery">🚚 Бесплатная доставка</option>
+              <option value="fixed">💰 Скидка на сумму (€)</option>
+              <option value="percent">% Скидка на процент</option>
+            </select>
+            {promoForm.type !== "free_delivery" && (
+              <input className="admin-input" type="number" placeholder={promoForm.type === "fixed" ? "Сумма скидки (€)" : "Процент скидки (%)"}
+                value={promoForm.value} onChange={e => setPromoForm(f => ({ ...f, value: e.target.value }))} />
+            )}
+            <input className="admin-input" type="number" placeholder="Мин. сумма заказа (необязательно)"
+              value={promoForm.minOrder} onChange={e => setPromoForm(f => ({ ...f, minOrder: e.target.value }))} />
+            <button className="btn btn--primary" disabled={!promoForm.code.trim() || promoLoading} onClick={createPromo}>
+              {promoLoading ? "Создание..." : "Создать промокод"}
+            </button>
+          </div>
+
+          {promos.length === 0
+            ? <p style={{ textAlign: "center", color: "var(--muted)", padding: 16 }}>Промокодов пока нет</p>
+            : promos.map(p => (
+              <div key={p.id} className="admin-item">
+                <div className="admin-item__info">
+                  <div>
+                    <div className="admin-item__title">{p.code}</div>
+                    <div className="admin-item__sub">
+                      {p.type === "free_delivery" && "🚚 Бесплатная доставка"}
+                      {p.type === "fixed"   && `💰 −${p.value} €`}
+                      {p.type === "percent" && `% −${p.value}%`}
+                      {p.minOrder ? ` · мин. ${p.minOrder} €` : ""}
+                    </div>
+                  </div>
+                </div>
+                <div className="admin-item__actions">
+                  <button className="admin-btn admin-btn--del" onClick={() => {
+                    if (window.confirm(`Удалить промокод «${p.code}»?`)) deletePromo(p.id);
+                  }}>🗑</button>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      )}
+
+      {/* ─── Orders (admin) ─── */}
+      {mode === "orders" && (
+        <div className="admin-list">
+          <div className="admin-order-filters">
+            {(["all", "new", "done", "cancelled"] as const).map(f => (
+              <button key={f} className={`admin-order-filter${ordersFilter === f ? " is-active" : ""}`}
+                onClick={() => setOrdersFilter(f)}>
+                {f === "all" ? "Все" : f === "new" ? "Новые" : f === "done" ? "Выполнены" : "Отменены"}
+              </button>
+            ))}
+          </div>
+
+          {ordersLoading && <p style={{ textAlign: "center", color: "var(--muted)", padding: 16 }}>Загрузка...</p>}
+
+          {!ordersLoading && adminOrders.filter(o => ordersFilter === "all" || o.status === ordersFilter).length === 0 && (
+            <p style={{ textAlign: "center", color: "var(--muted)", padding: 16 }}>Заказов нет</p>
+          )}
+
+          {adminOrders
+            .filter(o => ordersFilter === "all" || o.status === ordersFilter)
+            .map(order => {
+              const currency = order.items[0]?.currency ?? "€";
+              const qty = order.items.reduce((s, i) => s + i.qty, 0);
+              const freeShip = qty >= 3;
+              const shipFee = order.delivery && !freeShip ? 10 : 0;
+              const total = order.subtotal + shipFee - (order.discount ?? 0);
+              const date = new Date(order.createdAt).toLocaleDateString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+              const who = [order.tgName, order.tgUsername ? `@${order.tgUsername}` : null].filter(Boolean).join(" ");
+
+              return (
+                <div key={order.id} className={`admin-order-card admin-order-card--${order.status}`}>
+                  <div className="admin-order-card__header">
+                    <span className="admin-order-card__id">#{order.id.slice(-6).toUpperCase()}</span>
+                    <span className="admin-order-card__date">{date}</span>
+                  </div>
+                  <div className="admin-order-card__who">{who || `ID: ${order.tgUserId}`}</div>
+                  <div className="admin-order-card__items">
+                    {order.items.map((it, i) => (
+                      <div key={i}>{it.title}{it.flavor ? ` · ${it.flavor}` : ""} ×{it.qty}</div>
+                    ))}
+                  </div>
+                  <div className="admin-order-card__meta">
+                    {order.delivery ? `🚚 ${order.address}` : "🏠 Самовывоз"}
+                    {" · "}{order.payment === "cash" ? "💵" : "💳"}
+                    {order.discount ? ` · 🎟 −${order.discount} ${currency}` : ""}
+                    {" · "}<b>{total} {currency}</b>
+                  </div>
+
+                  {order.status === "new" && (
+                    <div className="admin-order-card__actions">
+                      <button className="admin-order-btn admin-order-btn--done"
+                        onClick={() => updateOrderStatus(order.id, "done")}>✓ Выполнен</button>
+                      <button className="admin-order-btn admin-order-btn--cancel"
+                        onClick={() => updateOrderStatus(order.id, "cancelled")}>✕ Отменить</button>
+                    </div>
+                  )}
+                  {order.status !== "new" && (
+                    <div className={`admin-order-badge ${order.status === "done" ? "admin-order-badge--done" : "admin-order-badge--cancelled"}`}>
+                      {order.status === "done" ? "✓ Выполнен" : "✕ Отменён"}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          }
         </div>
       )}
     </div>

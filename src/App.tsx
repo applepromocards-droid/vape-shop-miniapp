@@ -9,14 +9,17 @@ import { Cart } from "./pages/Cart";
 import { Profile } from "./pages/Profile";
 import { Admin } from "./pages/Admin";
 import { Checkout } from "./pages/Checkout";
+import { Orders } from "./pages/Orders";
+import { Addresses } from "./pages/Addresses";
 import { initTelegram } from "./telegram";
+
+type Screen = "main" | "admin" | "checkout" | "orders" | "addresses";
 
 function AppInner() {
   const { loading, isAdmin } = useCatalog();
-  const [tab, setTab] = useState<Tab>("catalog");
-  const [ageOk, setAgeOk]           = useState(isAgeConfirmed());
-  const [showAdmin, setShowAdmin]   = useState(false);
-  const [showCheckout, setShowCheckout] = useState(false);
+  const [tab, setTab]       = useState<Tab>("catalog");
+  const [ageOk, setAgeOk]   = useState(isAgeConfirmed());
+  const [screen, setScreen] = useState<Screen>("main");
 
   if (loading) {
     return (
@@ -28,16 +31,25 @@ function AppInner() {
 
   if (!ageOk) return <AgeGate onConfirm={() => setAgeOk(true)} />;
 
-  if (showAdmin) return <Admin onClose={() => setShowAdmin(false)} />;
-  if (showCheckout) return <Checkout onClose={() => setShowCheckout(false)} />;
+  if (screen === "admin")     return <Admin      onClose={() => setScreen("main")} />;
+  if (screen === "checkout")  return <Checkout   onClose={() => setScreen("main")} />;
+  if (screen === "orders")    return <Orders     onClose={() => setScreen("main")} />;
+  if (screen === "addresses") return <Addresses  onClose={() => setScreen("main")} />;
 
   return (
     <div className="app">
       <main className="app__content">
         {tab === "catalog"   && <Catalog />}
         {tab === "favorites" && <Favorites />}
-        {tab === "cart"      && <Cart onCheckout={() => setShowCheckout(true)} />}
-        {tab === "profile"   && <Profile onOpenAdmin={() => setShowAdmin(true)} isAdmin={isAdmin} />}
+        {tab === "cart"      && <Cart onCheckout={() => setScreen("checkout")} />}
+        {tab === "profile"   && (
+          <Profile
+            isAdmin={isAdmin}
+            onOpenAdmin={()     => setScreen("admin")}
+            onOpenOrders={()    => setScreen("orders")}
+            onOpenAddresses={() => setScreen("addresses")}
+          />
+        )}
       </main>
       <BottomNav active={tab} onChange={setTab} />
     </div>

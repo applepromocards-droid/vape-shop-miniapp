@@ -15,14 +15,23 @@ export function Checkout({ onClose }: { onClose: () => void }) {
   const [address, setAddress]           = useState("");
   const [payment, setPayment]           = useState<PaymentType>("cash");
   const [savedAddresses, setSavedAddresses] = useState<string[]>([]);
-  const [placing, setPlacing]           = useState(false);
-  const [placed, setPlaced]             = useState(false);
+  const [promoInput, setPromoInput]       = useState("");
+  const [promoApplied, setPromoApplied]   = useState<{ code: string; type: string; value: number } | null>(null);
+  const [promoError, setPromoError]       = useState("");
+  const [promoLoading, setPromoLoading]   = useState(false);
+  const [placing, setPlacing]             = useState(false);
+  const [placed, setPlaced]               = useState(false);
 
   const currency  = items[0]?.product.currency ?? "€";
   const totalQty  = items.reduce((s, i) => s + i.qty, 0);
-  const freeShip  = totalQty >= 3;
+  const freeShip  = totalQty >= 3 || promoApplied?.type === "free_delivery";
   const shipFee   = deliveryType === "delivery" && !freeShip ? 10 : 0;
-  const finalTotal = total + shipFee;
+  const discount  = promoApplied
+    ? promoApplied.type === "fixed"   ? promoApplied.value
+    : promoApplied.type === "percent" ? Math.round(total * promoApplied.value / 100)
+    : 0
+    : 0;
+  const finalTotal = Math.max(0, total + shipFee - discount);
 
   // Load saved addresses
   useEffect(() => {
@@ -53,6 +62,32 @@ export function Checkout({ onClose }: { onClose: () => void }) {
     return () => { back.offClick(cb); back.hide(); };
   }, [step, placed]);
 
+  const applyPromo = async () => {
+    if (!promoInput.trim()) return;
+    setPromoLoading(true);
+    setPromoError("");
+    try {
+      const res = await fetch("/api/promos/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoInput.trim(), subtotal: total }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        haptic("medium");
+        setPromoApplied({ code: data.code, type: data.type, value: data.value });
+        setPromoError("");
+      } else {
+        setPromoError(data.error ?? "Ошибка");
+        setPromoApplied(null);
+      }
+    } catch {
+      setPromoError("Ошибка соединения");
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
   const placeOrder = async () => {
     setPlacing(true);
     try {
@@ -71,6 +106,8 @@ export function Checkout({ onClose }: { onClose: () => void }) {
           delivery: deliveryType === "delivery",
           address: deliveryType === "delivery" ? address : null,
           payment,
+          promoCode: promoApplied?.code ?? null,
+          discount: discount > 0 ? discount : null,
         }),
       });
       haptic("heavy");
@@ -208,6 +245,34 @@ export function Checkout({ onClose }: { onClose: () => void }) {
             </button>
           </div>
 
+          {/* Promo code */}
+          <div className="checkout__promo-wrap">
+            <div className="checkout__label" style={{ marginTop: 20 }}>Промокод</div>
+            {promoApplied ? (
+              <div className="checkout__promo-applied">
+                <span>🎟 <b>{promoApplied.code}</b> — скидка применена</span>
+                <button onClick={() => { setPromoApplied(null); setPromoInput(""); }}>✕</button>
+              </div>
+            ) : (
+              <div className="checkout__promo-row">
+                <input
+                  className="checkout__promo-input"
+                  placeholder="Введите промокод"
+                  value={promoInput}
+                  onChange={e => { setPromoInput(e.target.value.toUpperCase()); setPromoError(""); }}
+                />
+                <button
+                  className="checkout__promo-btn"
+                  disabled={!promoInput.trim() || promoLoading}
+                  onClick={applyPromo}
+                >
+                  {promoLoading ? "..." : "OK"}
+                </button>
+              </div>
+            )}
+            {promoError && <div className="checkout__promo-error">{promoError}</div>}
+          </div>
+
           <button
             className="checkout__next"
             onClick={() => { haptic("light"); setStep("confirm"); }}
@@ -254,6 +319,12 @@ export function Checkout({ onClose }: { onClose: () => void }) {
               <div className="checkout-summary__row">
                 <span>Самовывоз</span>
                 <span className="checkout-summary__free">бесплатно</span>
+              </div>
+            )}
+            {discount > 0 && (
+              <div className="checkout-summary__row" style={{ color: "#4caf50" }}>
+                <span>🎟 Промокод {promoApplied?.code}</span>
+                <span>−{discount} {currency}</span>
               </div>
             )}
             <div className="checkout-summary__total">

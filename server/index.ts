@@ -8,21 +8,35 @@ import { resetRouter } from "./routes/reset.js";
 import { botRouter } from "./routes/bot.js";
 import { authRouter } from "./routes/auth.js";
 import { ordersRouter } from "./routes/orders.js";
+import { promosRouter, applyPromo } from "./routes/promos.js";
 import { adminOnly } from "./middleware/adminOnly.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
 
 app.use(cors());
-app.use(express.json({ limit: "20mb" })); // large enough for base64 images
+app.use(express.json({ limit: "20mb" }));
 
+// Public config endpoint
+app.get("/api/config", (_req, res) => {
+  const supportUrl = process.env.SUPPORT_URL ?? "";
+  res.json({ supportUrl });
+});
+
+// Public promo check (must be before adminOnly promos router)
+app.post("/api/promos/apply", applyPromo);
+
+// Protected routes
 app.use("/api/categories", adminOnly, categoriesRouter);
 app.use("/api/products",   adminOnly, productsRouter);
 app.use("/api/hero",       adminOnly, heroRouter);
 app.use("/api/reset",      adminOnly, resetRouter);
+app.use("/api/promos",     adminOnly, promosRouter);
+
+// Semi-public (orders has own auth per-route)
 app.use("/api/orders", ordersRouter);
-app.use("/api/bot",   botRouter);
-app.use("/api/auth",  authRouter);
+app.use("/api/bot",    botRouter);
+app.use("/api/auth",   authRouter);
 
 // Serve built React app in production
 if (process.env.NODE_ENV === "production") {

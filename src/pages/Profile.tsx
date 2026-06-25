@@ -1,18 +1,43 @@
+import { useEffect, useState } from "react";
 import { getTg } from "../telegram";
 
-const MENU = [
-  { icon: "📦", label: "Мои заказы" },
-  { icon: "📍", label: "Адреса доставки" },
-  { icon: "🎫", label: "Мои промокоды" },
-  { icon: "💬", label: "Поддержка" },
-];
+interface Props {
+  onOpenAdmin: () => void;
+  onOpenOrders: () => void;
+  onOpenAddresses: () => void;
+  isAdmin: boolean;
+}
 
-export function Profile({ onOpenAdmin, isAdmin }: { onOpenAdmin: () => void; isAdmin: boolean }) {
+export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, isAdmin }: Props) {
   const user = getTg()?.initDataUnsafe.user;
   const name = user
     ? `${user.first_name}${user.last_name ? " " + user.last_name : ""}`
     : "Гость";
   const username = user?.username ? `@${user.username}` : null;
+
+  const [supportUrl, setSupportUrl] = useState("");
+
+  useEffect(() => {
+    fetch("/api/config")
+      .then(r => r.json())
+      .then(d => { if (d.supportUrl) setSupportUrl(d.supportUrl); })
+      .catch(() => {});
+  }, []);
+
+  const openSupport = () => {
+    const tg = getTg();
+    if (supportUrl && tg) {
+      tg.openTelegramLink(supportUrl);
+    } else if (tg) {
+      tg.close();
+    }
+  };
+
+  const MENU = [
+    { icon: "📦", label: "Мои заказы",     action: onOpenOrders },
+    { icon: "📍", label: "Адреса доставки", action: onOpenAddresses },
+    { icon: "💬", label: "Поддержка",       action: openSupport },
+  ];
 
   return (
     <div>
@@ -29,7 +54,7 @@ export function Profile({ onOpenAdmin, isAdmin }: { onOpenAdmin: () => void; isA
 
         <div className="profile__menu">
           {MENU.map((m) => (
-            <button key={m.label} className="menu-item">
+            <button key={m.label} className="menu-item" onClick={m.action}>
               <span className="menu-item__icon">{m.icon}</span>
               <span className="menu-item__label">{m.label}</span>
               <span className="menu-item__arrow">›</span>
