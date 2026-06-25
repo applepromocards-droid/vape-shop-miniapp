@@ -44,6 +44,7 @@ export interface TgWebApp {
   };
   sendData: (data: string) => void;
   openTelegramLink: (url: string) => void;
+  openLink: (url: string) => void;
   setHeaderColor: (color: string) => void;
   setBackgroundColor: (color: string) => void;
 }
