@@ -55,6 +55,12 @@ referralsRouter.post("/", async (req, res) => {
     return res.json({ ok: false, error: "Нельзя указать себя" });
   }
 
+  // Check inviter exists in our system
+  const inviterExists = await prisma.tgUser.findFirst({
+    where: { username: { equals: cleaned, mode: "insensitive" } },
+  });
+  if (!inviterExists) return res.json({ ok: false, error: "Пользователь @" + cleaned + " не найден. Попроси его сначала открыть магазин." });
+
   // Already has a referral record
   const existing = await prisma.referral.findUnique({ where: { invitedUserId: user.id } });
   if (existing) return res.json({ ok: false, error: "Реферер уже указан" });
