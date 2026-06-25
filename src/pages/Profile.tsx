@@ -35,10 +35,8 @@ export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, onOpenRefe
     const tg = getTg();
     if (supportUrl && tg) {
       tg.openTelegramLink(supportUrl);
-    } else if (supportUserId) {
-      window.open(`tg://user?id=${supportUserId}`, "_blank");
-    } else if (tg) {
-      tg.close();
+    } else if (supportUserId && tg) {
+      tg.openLink(`tg://openmessage?user_id=${supportUserId}`);
     }
   };
 
