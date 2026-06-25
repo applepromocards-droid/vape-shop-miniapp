@@ -92,7 +92,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteCategory = async (id: string) => {
-    await apiFetch(`${API}/categories/${id}`, { method: "DELETE" });
+    await apiFetch(`${API}/categories/${id}`, { method: "DELETE", headers: adminHeaders() });
     setCategories((prev) => prev.filter((x) => x.id !== id));
     setProducts((prev) => prev.filter((x) => x.categoryId !== id));
   };
@@ -116,7 +116,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteProduct = async (id: string) => {
-    await apiFetch(`${API}/products/${id}`, { method: "DELETE" });
+    await apiFetch(`${API}/products/${id}`, { method: "DELETE", headers: adminHeaders() });
     setProducts((prev) => prev.filter((x) => x.id !== id));
   };
 
@@ -133,7 +133,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   };
 
   const resetToDefaults = async () => {
-    await apiFetch(`${API}/reset`, { method: "POST" });
+    await apiFetch(`${API}/reset`, { method: "POST", headers: adminHeaders() });
     const [cats, prods, h] = await Promise.all([
       apiFetch<Category[]>(`${API}/categories`),
       apiFetch<Product[]>(`${API}/products`),
