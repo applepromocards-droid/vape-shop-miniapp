@@ -28,7 +28,7 @@ body {
 }
 
 .app { display: flex; flex-direction: column; min-height: 100dvh; min-height: 100vh; }
-.app__content { flex: 1; padding-bottom: 72px; overflow-x: hidden; }
+.app__content { flex: 1; padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); overflow-x: hidden; }
 .page { padding: 0 18px 24px; }
 
 /* ── Catalog header ─────────────────────── */
@@ -474,9 +474,10 @@ body {
 .bottom-nav {
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: 66px;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
   display: flex;
+  align-items: flex-start;
+  padding-top: 10px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   background: rgba(15, 9, 10, 0.96);
   backdrop-filter: blur(12px);
   border-top: 1px solid rgba(201,48,44,.18);
@@ -489,6 +490,7 @@ body {
   color: var(--faint);
   font-size: 11px;
   background: none; border: none; cursor: pointer; font-family: inherit;
+  padding: 0;
 }
 .bottom-nav__item.is-active { color: var(--gold); }
 .bottom-nav__icon { position: relative; display: inline-flex; }

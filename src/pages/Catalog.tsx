@@ -6,13 +6,10 @@ import { useCatalog } from "../context/CatalogContext";
 import { getTg } from "../telegram";
 import type { Product } from "../types";
 
-const BRANDS = ["Все", "Elf Bar", "Lost Mary", "HQD", "Chaser"];
-
 export function Catalog() {
   const { categories, productsByCategory, hero } = useCatalog();
   const [openCat, setOpenCat] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [brand, setBrand] = useState("Все");
   const [pickerProduct, setPickerProduct] = useState<Product | null>(null);
 
   const category = categories.find((c) => c.id === openCat);
@@ -20,7 +17,7 @@ export function Catalog() {
   useEffect(() => {
     const tg = getTg();
     if (!tg) return;
-    const back = () => { setOpenCat(null); setBrand("Все"); };
+    const back = () => setOpenCat(null);
     if (openCat) {
       tg.BackButton.show();
       tg.BackButton.onClick(back);
@@ -31,10 +28,7 @@ export function Catalog() {
   }, [openCat]);
 
   if (category) {
-    const allProducts = productsByCategory(category.id);
-    const products = brand === "Все"
-      ? allProducts
-      : allProducts.filter((p) => p.title.toLowerCase().includes(brand.toLowerCase()));
+    const products = productsByCategory(category.id);
 
     return (
       <div>
@@ -42,22 +36,10 @@ export function Catalog() {
           <FlavorPicker product={pickerProduct} onClose={() => setPickerProduct(null)} />
         )}
         <div className="page-header">
-          <button className="page-header__back" onClick={() => { setOpenCat(null); setBrand("Все"); }}>
+          <button className="page-header__back" onClick={() => setOpenCat(null)}>
             ‹
           </button>
           <h1 className="page-header__title">{category.title} {category.subtitle}</h1>
-        </div>
-
-        <div className="filter-chips">
-          {BRANDS.map((b) => (
-            <button
-              key={b}
-              className={`chip ${brand === b ? "chip--active" : "chip--inactive"}`}
-              onClick={() => setBrand(b)}
-            >
-              {b}
-            </button>
-          ))}
         </div>
 
         <div className="prod-list">
