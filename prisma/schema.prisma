@@ -42,6 +42,28 @@ model Flavor {
   ord       Int     @default(0)
 }
 
+model Order {
+  id         String   @id @default(cuid())
+  tgUserId   String
+  tgUsername String?
+  tgName     String?
+  items      Json
+  subtotal   Float
+  delivery   Boolean  @default(false)
+  address    String?
+  payment    String   @default("cash")
+  status     String   @default("new")
+  createdAt  DateTime @default(now())
+  @@index([tgUserId])
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  tgUserId  String   @unique
+  address   String
+  updatedAt DateTime @updatedAt
+}
+
 model Hero {
   id        String   @id @default("singleton")
   visible   Boolean  @default(true)

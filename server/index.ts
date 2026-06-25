@@ -7,6 +7,7 @@ import { heroRouter } from "./routes/hero.js";
 import { resetRouter } from "./routes/reset.js";
 import { botRouter } from "./routes/bot.js";
 import { authRouter } from "./routes/auth.js";
+import { ordersRouter } from "./routes/orders.js";
 import { adminOnly } from "./middleware/adminOnly.js";
 
 const app = express();
@@ -19,8 +20,9 @@ app.use("/api/categories", adminOnly, categoriesRouter);
 app.use("/api/products",   adminOnly, productsRouter);
 app.use("/api/hero",       adminOnly, heroRouter);
 app.use("/api/reset",      adminOnly, resetRouter);
-app.use("/api/bot",  botRouter);
-app.use("/api/auth", authRouter);
+app.use("/api/orders", ordersRouter);
+app.use("/api/bot",   botRouter);
+app.use("/api/auth",  authRouter);
 
 // Serve built React app in production
 if (process.env.NODE_ENV === "production") {
