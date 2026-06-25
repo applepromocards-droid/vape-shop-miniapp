@@ -22,7 +22,9 @@ app.use(express.json({ limit: "20mb" }));
 // Public config endpoint
 app.get("/api/config", (_req, res) => {
   const supportUrl = process.env.SUPPORT_URL ?? "";
-  res.json({ supportUrl });
+  const adminIds = (process.env.ADMIN_IDS ?? "").split(",").map(s => s.trim()).filter(Boolean);
+  const supportUserId = process.env.SUPPORT_USER_ID ?? adminIds[0] ?? "";
+  res.json({ supportUrl, supportUserId });
 });
 
 // Public promo check (must be before adminOnly promos router)

@@ -16,12 +16,16 @@ export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, onOpenRefe
     : "Гость";
   const username = user?.username ? `@${user.username}` : null;
 
-  const [supportUrl, setSupportUrl] = useState("");
+  const [supportUrl, setSupportUrl]       = useState("");
+  const [supportUserId, setSupportUserId] = useState("");
 
   useEffect(() => {
     fetch("/api/config")
       .then(r => r.json())
-      .then(d => { if (d.supportUrl) setSupportUrl(d.supportUrl); })
+      .then(d => {
+        if (d.supportUrl)    setSupportUrl(d.supportUrl);
+        if (d.supportUserId) setSupportUserId(d.supportUserId);
+      })
       .catch(() => {});
   }, []);
 
@@ -29,6 +33,9 @@ export function Profile({ onOpenAdmin, onOpenOrders, onOpenAddresses, onOpenRefe
     const tg = getTg();
     if (supportUrl && tg) {
       tg.openTelegramLink(supportUrl);
+    } else if (supportUserId) {
+      // Open direct chat by Telegram user ID via native tg:// scheme
+      window.open(`tg://user?id=${supportUserId}`, "_blank");
     } else if (tg) {
       tg.close();
     }
