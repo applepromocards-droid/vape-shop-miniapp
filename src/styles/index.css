@@ -1319,3 +1319,121 @@ body {
 .admin-order-badge { text-align: center; font-size: 12px; font-weight: 700; padding: 6px; border-radius: 8px; }
 .admin-order-badge--done      { background: rgba(76,175,80,.1);  color: #4caf50; }
 .admin-order-badge--cancelled { background: rgba(201,48,44,.1);  color: var(--red); }
+
+/* ── Favorites heart button ─────────────── */
+.prod-card__fav {
+  position: absolute;
+  top: 8px; right: 8px;
+  z-index: 2;
+  background: rgba(13,8,9,.55);
+  border: none;
+  border-radius: 50%;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  color: rgba(255,255,255,.7);
+  cursor: pointer;
+  transition: transform .15s, color .15s;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.prod-card__fav--active { color: #e04040; }
+.prod-card__fav:active  { transform: scale(.85); }
+
+/* ── Profile referral block ─────────────── */
+.profile__ref-block {
+  background: linear-gradient(135deg, #1d0d0f, #160b0c);
+  border: 1px solid rgba(201,48,44,.2);
+  border-radius: 18px;
+  padding: 16px 16px 14px;
+  margin: 14px 18px 4px;
+  text-align: left;
+}
+.profile__ref-title {
+  font-size: 14px; font-weight: 800;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.profile__ref-sub {
+  font-size: 12px; color: var(--muted);
+  margin-bottom: 11px; line-height: 1.4;
+}
+.profile__ref-progress {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.profile__ref-bar {
+  flex: 1; height: 6px; border-radius: 3px;
+  background: rgba(255,255,255,.1); overflow: hidden;
+}
+.profile__ref-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--red), var(--gold));
+  transition: width .4s ease;
+}
+.profile__ref-count {
+  font-size: 13px; font-weight: 800; color: var(--gold); white-space: nowrap;
+}
+.profile__ref-reward {
+  font-size: 12px; font-weight: 700; color: var(--gold); margin-bottom: 6px;
+}
+.profile__ref-pending {
+  font-size: 12px; color: var(--muted); margin-bottom: 6px;
+}
+.profile__ref-share {
+  font-size: 11px; color: var(--faint); line-height: 1.4;
+}
+.profile__ref-share b { color: var(--muted); }
+
+/* ── Referral Onboarding screen ─────────── */
+.ref-onboarding {
+  min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 32px 24px 48px;
+  background: #0d0809;
+  text-align: center;
+}
+.ref-onboarding__icon { font-size: 64px; margin-bottom: 20px; }
+.ref-onboarding__title {
+  font-size: 22px; font-weight: 900;
+  color: var(--text); margin-bottom: 10px;
+}
+.ref-onboarding__sub {
+  font-size: 14px; color: var(--muted); line-height: 1.55;
+  max-width: 300px; margin: 0 auto 28px;
+}
+.ref-onboarding__input-wrap {
+  display: flex; align-items: center; gap: 0;
+  background: var(--card); border: 1px solid var(--border-r);
+  border-radius: 14px; padding: 0 14px;
+  width: 100%; max-width: 300px;
+  margin-bottom: 6px;
+}
+.ref-onboarding__at {
+  font-size: 18px; font-weight: 700; color: var(--gold);
+  padding-right: 4px; user-select: none;
+}
+.ref-onboarding__input {
+  flex: 1; background: none; border: none; outline: none;
+  font-family: inherit; font-size: 16px;
+  color: var(--text); padding: 14px 0;
+}
+.ref-onboarding__error {
+  font-size: 12px; color: var(--red);
+  margin-bottom: 6px; width: 100%; max-width: 300px; text-align: left;
+}
+.ref-onboarding__btn {
+  width: 100%; max-width: 300px;
+  padding: 16px; border-radius: 14px; border: none;
+  font-family: inherit; font-size: 16px; font-weight: 800;
+  cursor: pointer; margin-top: 10px;
+  transition: opacity .15s;
+}
+.ref-onboarding__btn:active { opacity: .8; }
+.ref-onboarding__btn--primary {
+  background: var(--red); color: #fff;
+}
+.ref-onboarding__btn--skip {
+  background: transparent; color: var(--muted);
+  font-weight: 600; font-size: 14px;
+}

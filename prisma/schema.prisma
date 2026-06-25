@@ -77,6 +77,31 @@ model Address {
   @@index([tgUserId])
 }
 
+model Favorite {
+  tgUserId  String
+  productId String
+  createdAt DateTime @default(now())
+  @@id([tgUserId, productId])
+  @@index([tgUserId])
+}
+
+model Referral {
+  id              String   @id @default(cuid())
+  invitedUserId   String   @unique
+  inviterUsername String
+  confirmed       Boolean  @default(false)
+  rewardSent      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  @@index([inviterUsername])
+}
+
+model TgUser {
+  id        String   @id
+  username  String?
+  name      String?
+  updatedAt DateTime @updatedAt
+}
+
 model Hero {
   id        String   @id @default("singleton")
   visible   Boolean  @default(true)

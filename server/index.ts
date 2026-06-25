@@ -9,6 +9,8 @@ import { botRouter } from "./routes/bot.js";
 import { authRouter } from "./routes/auth.js";
 import { ordersRouter } from "./routes/orders.js";
 import { promosRouter, applyPromo } from "./routes/promos.js";
+import { favoritesRouter } from "./routes/favorites.js";
+import { referralsRouter } from "./routes/referrals.js";
 import { adminOnly } from "./middleware/adminOnly.js";
 
 const app = express();
@@ -33,8 +35,10 @@ app.use("/api/hero",       adminOnly, heroRouter);
 app.use("/api/reset",      adminOnly, resetRouter);
 app.use("/api/promos",     adminOnly, promosRouter);
 
-// Semi-public (orders has own auth per-route)
-app.use("/api/orders", ordersRouter);
+// Semi-public (own auth per-route)
+app.use("/api/orders",    ordersRouter);
+app.use("/api/favorites", favoritesRouter);
+app.use("/api/referrals", referralsRouter);
 app.use("/api/bot",    botRouter);
 app.use("/api/auth",   authRouter);
 

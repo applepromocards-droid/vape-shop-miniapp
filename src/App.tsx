@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { CatalogProvider, useCatalog } from "./context/CatalogContext";
 import { CartProvider } from "./context/CartContext";
+import { FavoritesProvider } from "./context/FavoritesContext";
 import { BottomNav, type Tab } from "./components/BottomNav";
 import { AgeGate, isAgeConfirmed } from "./components/AgeGate";
 import { Catalog } from "./pages/Catalog";
@@ -11,15 +12,35 @@ import { Admin } from "./pages/Admin";
 import { Checkout } from "./pages/Checkout";
 import { Orders } from "./pages/Orders";
 import { Addresses } from "./pages/Addresses";
-import { initTelegram } from "./telegram";
+import { ReferralOnboarding } from "./pages/ReferralOnboarding";
+import { getTg, initTelegram } from "./telegram";
 
 type Screen = "main" | "admin" | "checkout" | "orders" | "addresses";
+
+function hasSeenRefOnboarding() {
+  const uid = getTg()?.initDataUnsafe.user?.id;
+  if (!uid) return true; // not in Telegram, skip
+  return !!localStorage.getItem(`ref_asked_${uid}`);
+}
+
+function markRefOnboardingSeen() {
+  const uid = getTg()?.initDataUnsafe.user?.id;
+  if (uid) localStorage.setItem(`ref_asked_${uid}`, "1");
+}
 
 function AppInner() {
   const { loading, isAdmin } = useCatalog();
   const [tab, setTab]       = useState<Tab>("catalog");
   const [ageOk, setAgeOk]   = useState(isAgeConfirmed());
   const [screen, setScreen] = useState<Screen>("main");
+  const [showRef, setShowRef] = useState(false);
+
+  // Show referral onboarding once after age gate
+  useEffect(() => {
+    if (ageOk && !loading && !hasSeenRefOnboarding()) {
+      setShowRef(true);
+    }
+  }, [ageOk, loading]);
 
   if (loading) {
     return (
@@ -30,6 +51,10 @@ function AppInner() {
   }
 
   if (!ageOk) return <AgeGate onConfirm={() => setAgeOk(true)} />;
+
+  if (showRef) return (
+    <ReferralOnboarding onDone={() => { markRefOnboardingSeen(); setShowRef(false); }} />
+  );
 
   if (screen === "admin")     return <Admin      onClose={() => setScreen("main")} />;
   if (screen === "checkout")  return <Checkout   onClose={() => setScreen("main")} />;
@@ -62,7 +87,9 @@ export default function App() {
   return (
     <CatalogProvider>
       <CartProvider>
-        <AppInner />
+        <FavoritesProvider>
+          <AppInner />
+        </FavoritesProvider>
       </CartProvider>
     </CatalogProvider>
   );

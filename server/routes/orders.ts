@@ -3,6 +3,7 @@ import type { Request } from "express";
 import prisma from "../lib/prisma.js";
 import { verifyInitData, parseInitData } from "../lib/telegram.js";
 import { adminOnly } from "../middleware/adminOnly.js";
+import { confirmReferral } from "./referrals.js";
 
 export const ordersRouter = Router();
 
@@ -151,6 +152,16 @@ ordersRouter.put("/:id/status", adminOnly, async (req, res) => {
       ? "✅ Ваш заказ выполнен! Спасибо за покупку 🙏"
       : "❌ Ваш заказ был отменён. Свяжитесь с нами для уточнения деталей.";
     await tg("sendMessage", { chat_id: order.tgUserId, text: statusText });
+  }
+
+  // On first completed order — confirm referral + possibly send reward
+  if (status === "done") {
+    const prevDone = await prisma.order.count({
+      where: { tgUserId: order.tgUserId, status: "done", id: { not: order.id } },
+    });
+    if (prevDone === 0) {
+      await confirmReferral(order.tgUserId);
+    }
   }
 
   return res.json(order);

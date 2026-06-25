@@ -1,5 +1,7 @@
 import type { Product } from "../types";
 import { useCart } from "../context/CartContext";
+import { useFavorites } from "../context/FavoritesContext";
+import { haptic } from "../telegram";
 
 interface Props {
   product: Product;
@@ -8,6 +10,7 @@ interface Props {
 
 export function ProductCard({ product, onSelectFlavor }: Props) {
   const { add } = useCart();
+  const { isFavorite, toggle } = useFavorites();
 
   const hasFlavors = (product.flavors?.length ?? 0) > 0;
   const anyInStock = hasFlavors
@@ -15,11 +18,19 @@ export function ProductCard({ product, onSelectFlavor }: Props) {
     : product.inStock;
 
   const inStockCount = product.flavors?.filter((f) => f.inStock).length ?? 0;
+  const fav = isFavorite(product.id);
 
   return (
     <div className="prod-card">
       <div className="prod-card__thumb">
         {product.badge && <span className="prod-card__badge">{product.badge}</span>}
+        <button
+          className={`prod-card__fav${fav ? " prod-card__fav--active" : ""}`}
+          onClick={(e) => { e.stopPropagation(); haptic("light"); toggle(product.id); }}
+          aria-label={fav ? "Убрать из избранного" : "Добавить в избранное"}
+        >
+          {fav ? "♥" : "♡"}
+        </button>
         {product.image
           ? <img src={product.image} alt={product.title} className="prod-card__img" />
           : <span className="prod-card__emoji">{product.emoji}</span>
