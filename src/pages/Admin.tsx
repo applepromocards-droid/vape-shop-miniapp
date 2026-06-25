@@ -158,7 +158,7 @@ export function Admin({ onClose }: { onClose: () => void }) {
     setCatForm({ id: c.id, title: c.title, subtitle: c.subtitle ?? "", emoji: c.emoji, image: c.image });
     setMode("cat-form");
   };
-  const saveCat = () => {
+  const saveCat = async () => {
     if (!catForm.title.trim()) return;
     const data = {
       title: catForm.title.trim(),
@@ -166,8 +166,8 @@ export function Admin({ onClose }: { onClose: () => void }) {
       emoji: catForm.emoji || "🛒",
       image: catForm.image || undefined,
     };
-    if (catForm.id) updateCategory({ ...data, id: catForm.id });
-    else addCategory(data);
+    if (catForm.id) await updateCategory({ ...data, id: catForm.id });
+    else await addCategory(data);
     setMode("cats");
   };
 
@@ -187,7 +187,7 @@ export function Admin({ onClose }: { onClose: () => void }) {
     });
     setMode("prod-form");
   };
-  const saveProd = () => {
+  const saveProd = async () => {
     if (!prodForm.title.trim() || !prodForm.categoryId) return;
     const flavors: Flavor[] = prodForm.flavors
       .filter((f) => f.name.trim())
@@ -204,8 +204,8 @@ export function Admin({ onClose }: { onClose: () => void }) {
       image: prodForm.image || undefined,
       flavors: flavors.length > 0 ? flavors : undefined,
     };
-    if (prodForm.id) updateProduct({ ...data, id: prodForm.id });
-    else addProduct(data);
+    if (prodForm.id) await updateProduct({ ...data, id: prodForm.id });
+    else await addProduct(data);
     setMode("prods");
   };
 

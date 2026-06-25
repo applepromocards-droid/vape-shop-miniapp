@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  title    String
+  subtitle String?
+  emoji    String
+  image    String?   @db.Text
+  ord      Int       @default(0)
+  products Product[]
+}
+
+model Product {
+  id         String   @id @default(cuid())
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  title      String
+  price      Float
+  currency   String   @default("€")
+  emoji      String
+  image      String?  @db.Text
+  puffs      Int?
+  badge      String?
+  inStock    Boolean  @default(true)
+  ord        Int      @default(0)
+  flavors    Flavor[]
+}
+
+model Flavor {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  inStock   Boolean @default(true)
+  ord       Int     @default(0)
+}
+
+model Hero {
+  id        String   @id @default("singleton")
+  visible   Boolean  @default(true)
+  tag       String   @default("НОВИНКА")
+  title     String   @default("Elf Bar\nSweet King")
+  subtitle  String   @default("30 000 затяжек · 4 вкуса")
+  image     String?  @db.Text
+  imagePosX Float?
+  imagePosY Float?
+  imageZoom Float?
+}
