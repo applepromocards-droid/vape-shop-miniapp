@@ -899,6 +899,17 @@ body {
 .prod-card__pick:disabled { opacity: 0.4; cursor: not-allowed; }
 .prod-card__pick:active { opacity: 0.8; }
 
+/* Products inside category form */
+.admin-cat-prods {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-r);
+}
+
+.admin-item--compact {
+  padding: 8px 10px;
+}
+
 /* Admin entry in profile */
 .menu-item--admin {
   border-color: rgba(224,182,92,.2);

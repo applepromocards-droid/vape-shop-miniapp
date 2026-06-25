@@ -62,6 +62,7 @@ export function Admin({ onClose }: { onClose: () => void }) {
   } = useCatalog();
 
   const [mode, setMode] = useState<Mode>("cats");
+  const [returnMode, setReturnMode] = useState<Mode>("prods");
   const [catForm, setCatForm] = useState<CatForm>(BLANK_CAT);
   const [prodForm, setProdForm] = useState<ProdForm>(blankProd());
   const [heroForm, setHeroForm] = useState<HeroForm>({
@@ -174,9 +175,15 @@ export function Admin({ onClose }: { onClose: () => void }) {
   /* ── Product actions ── */
   const openNewProd = () => {
     setProdForm(blankProd(categories[0]?.id ?? ""));
+    setReturnMode("prods");
     setMode("prod-form");
   };
-  const openEditProd = (p: Product) => {
+  const openNewProdForCat = (catId: string) => {
+    setProdForm(blankProd(catId));
+    setReturnMode("cat-form");
+    setMode("prod-form");
+  };
+  const openEditProd = (p: Product, from: Mode = "prods") => {
     setProdForm({
       id: p.id, title: p.title,
       price: p.price, currency: p.currency, emoji: p.emoji,
@@ -185,6 +192,7 @@ export function Admin({ onClose }: { onClose: () => void }) {
       image: p.image,
       flavors: p.flavors?.map((f) => ({ ...f })) ?? [],
     });
+    setReturnMode(from);
     setMode("prod-form");
   };
   const saveProd = async () => {
@@ -206,7 +214,7 @@ export function Admin({ onClose }: { onClose: () => void }) {
     };
     if (prodForm.id) await updateProduct({ ...data, id: prodForm.id });
     else await addProduct(data);
-    setMode("prods");
+    setMode(returnMode);
   };
 
   /* ── Flavor helpers ── */
@@ -265,7 +273,7 @@ export function Admin({ onClose }: { onClose: () => void }) {
   /* ── Back logic ── */
   const handleBack = () => {
     if (mode === "cat-form") { setMode("cats"); return; }
-    if (mode === "prod-form") { setMode("prods"); return; }
+    if (mode === "prod-form") { setMode(returnMode); return; }
     onClose();
   };
 
@@ -556,6 +564,44 @@ export function Admin({ onClose }: { onClose: () => void }) {
               Сохранить
             </button>
           </div>
+
+          {/* Products in this category */}
+          {catForm.id && (() => {
+            const catProds = products.filter((p) => p.categoryId === catForm.id);
+            return (
+              <div className="admin-cat-prods">
+                <div className="admin-label">
+                  Товары в категории
+                  <span className="admin-tab__count" style={{ marginLeft: 6 }}>{catProds.length}</span>
+                </div>
+                {catProds.map((p) => (
+                  <div key={p.id} className="admin-item admin-item--compact">
+                    <div className="admin-item__info">
+                      <div className="admin-item__thumb" style={{ width: 32, height: 32 }}>
+                        {p.image
+                          ? <img src={p.image} alt="" className="admin-item__thumb-img" />
+                          : <span style={{ fontSize: 18 }}>{p.emoji}</span>
+                        }
+                      </div>
+                      <div>
+                        <div className="admin-item__title" style={{ fontSize: 13 }}>{p.title}</div>
+                        <div className="admin-item__sub" style={{ fontSize: 11 }}>{p.price} {p.currency}</div>
+                      </div>
+                    </div>
+                    <div className="admin-item__actions">
+                      <button className="admin-btn admin-btn--edit" onClick={() => openEditProd(p, "cat-form")}>✏️</button>
+                      <button className="admin-btn admin-btn--del" onClick={() => {
+                        if (window.confirm(`Удалить «${p.title}»?`)) deleteProduct(p.id);
+                      }}>🗑</button>
+                    </div>
+                  </div>
+                ))}
+                <button className="admin-add-btn" style={{ marginTop: 8 }} onClick={() => openNewProdForCat(catForm.id!)}>
+                  + Добавить товар в эту категорию
+                </button>
+              </div>
+            );
+          })()}
         </div>
       )}
 
