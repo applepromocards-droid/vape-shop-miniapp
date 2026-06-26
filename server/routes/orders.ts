@@ -47,6 +47,8 @@ function buildAdminMessage(order: {
   delivery: boolean;
   address: string | null;
   payment: string;
+  changeNeeded?: boolean | null;
+  changeFrom?: string | null;
   promoCode: string | null;
   discount: number | null;
 }) {
@@ -77,7 +79,16 @@ function buildAdminMessage(order: {
       : `🚚 Доставка: 10 ${currency}\n📍 Адрес: ${order.address}`
     : "🏠 Самовывоз";
 
-  const paymentLabel = order.payment === "cash" ? "💵 Наличными" : "💳 Картой";
+  let paymentLabel = order.payment === "cash" ? "💵 Наличными" : "💳 Картой";
+  if (order.payment === "cash") {
+    if (order.changeNeeded && order.changeFrom) {
+      paymentLabel += ` · сдача с ${order.changeFrom}`;
+    } else if (order.changeNeeded) {
+      paymentLabel += ` · нужна сдача`;
+    } else {
+      paymentLabel += ` · без сдачи`;
+    }
+  }
 
   const lines = [
     `🛍 Новый заказ! #${order.id.slice(-6).toUpperCase()}`,
@@ -172,12 +183,14 @@ ordersRouter.post("/", async (req, res) => {
   const user = getUser(req);
   if (!user) return res.status(401).json({ error: "Unauthorized" });
 
-  const { items, subtotal, delivery, address, payment, promoCode, discount } = req.body as {
+  const { items, subtotal, delivery, address, payment, changeNeeded, changeFrom, promoCode, discount } = req.body as {
     items: { title: string; flavor?: string; qty: number; price: number; currency: string }[];
     subtotal: number;
     delivery: boolean;
     address?: string;
     payment: "cash" | "card";
+    changeNeeded?: boolean | null;
+    changeFrom?: string | null;
     promoCode?: string;
     discount?: number;
   };
@@ -216,7 +229,7 @@ ordersRouter.post("/", async (req, res) => {
   if (ADMIN_CHAT_ID) {
     await tg("sendMessage", {
       chat_id: ADMIN_CHAT_ID,
-      text: buildAdminMessage({ ...order, items: order.items as unknown }),
+      text: buildAdminMessage({ ...order, items: order.items as unknown, changeNeeded: changeNeeded ?? null, changeFrom: changeFrom ?? null }),
     });
   }
 
