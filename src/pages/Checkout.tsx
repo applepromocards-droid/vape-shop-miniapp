@@ -6,6 +6,7 @@ import { getTg, getInitData, haptic } from "../telegram";
 type Step = "delivery" | "payment" | "confirm";
 type DeliveryType = "delivery" | "pickup";
 type PaymentType = "cash" | "card";
+type ChangeOption = "yes" | "no";
 
 export function Checkout({ onClose }: { onClose: () => void }) {
   const { items, total, clear } = useCart();
@@ -21,6 +22,8 @@ export function Checkout({ onClose }: { onClose: () => void }) {
   const [promoApplied, setPromoApplied]   = useState<{ code: string; type: string; value: number } | null>(null);
   const [promoError, setPromoError]       = useState("");
   const [promoLoading, setPromoLoading]   = useState(false);
+  const [changeOption, setChangeOption]   = useState<ChangeOption>("no");
+  const [changeFrom, setChangeFrom]       = useState("");
   const [placing, setPlacing]             = useState(false);
   const [placed, setPlaced]               = useState(false);
 
@@ -106,6 +109,8 @@ export function Checkout({ onClose }: { onClose: () => void }) {
           delivery: deliveryType === "delivery",
           address: deliveryType === "delivery" ? address : null,
           payment,
+          changeNeeded: payment === "cash" ? changeOption === "yes" : null,
+          changeFrom: payment === "cash" && changeOption === "yes" ? (changeFrom.trim() || null) : null,
           promoCode: promoApplied?.code ?? null,
           discount: discount > 0 ? discount : null,
         }),
@@ -239,6 +244,42 @@ export function Checkout({ onClose }: { onClose: () => void }) {
             </button>
           </div>
 
+          {payment === "cash" && (
+            <div className="checkout__change-wrap">
+              <div className="checkout__label" style={{ marginTop: 20 }}>{t.checkout_change_label}</div>
+              <div className="checkout__options">
+                <button
+                  className={`checkout-option${changeOption === "no" ? " checkout-option--active" : ""}`}
+                  onClick={() => { haptic("light"); setChangeOption("no"); setChangeFrom(""); }}
+                >
+                  <span className="checkout-option__icon">✅</span>
+                  <span className="checkout-option__name">{t.checkout_change_no}</span>
+                </button>
+                <button
+                  className={`checkout-option${changeOption === "yes" ? " checkout-option--active" : ""}`}
+                  onClick={() => { haptic("light"); setChangeOption("yes"); }}
+                >
+                  <span className="checkout-option__icon">💰</span>
+                  <span className="checkout-option__name">{t.checkout_change_yes}</span>
+                </button>
+              </div>
+              {changeOption === "yes" && (
+                <div style={{ marginTop: 12 }}>
+                  <div className="checkout__label">{t.checkout_change_from}</div>
+                  <input
+                    className="checkout__promo-input"
+                    style={{ width: "100%", boxSizing: "border-box" }}
+                    type="number"
+                    inputMode="numeric"
+                    placeholder={t.checkout_change_placeholder}
+                    value={changeFrom}
+                    onChange={e => setChangeFrom(e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="checkout__promo-wrap">
             <div className="checkout__label" style={{ marginTop: 20 }}>{t.checkout_promo_label}</div>
             {promoApplied ? (
@@ -331,7 +372,12 @@ export function Checkout({ onClose }: { onClose: () => void }) {
                 ? <span>📍 {address}</span>
                 : <span>🏠 {t.checkout_pickup}</span>
               }
-              <span>{payment === "cash" ? `💵 ${t.checkout_cash}` : `💳 ${t.checkout_card}`}</span>
+              <span>
+                {payment === "cash"
+                  ? `💵 ${t.checkout_cash}${changeOption === "yes" ? ` · ${t.checkout_change_yes}${changeFrom ? ` (${changeFrom})` : ""}` : ` · ${t.checkout_change_no}`}`
+                  : `💳 ${t.checkout_card}`
+                }
+              </span>
             </div>
           </div>
 
